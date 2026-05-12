@@ -1,4 +1,4 @@
-# Deployment Guide for AnimePulse
+# Deployment Guide for AniView
 
 ## Architecture: Split Deployment
 

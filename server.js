@@ -1,5 +1,5 @@
 /**
- * AnimePulse server — powered by Senshi.live API
+ * AniView server — powered by Senshi.live API
  *
  * All anime data, episode lists, and stream URLs are sourced from senshi.live.
  * The /api/media proxy handles CORS for m3u8 playlists and video segments.

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>AnimePulse - Watch Anime</title>
+    <title>AniView - Watch Anime</title>
     <meta name="description" content="Watch anime online.">
     <link rel="icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
+    <meta name="7b1f191d269920a0a02d7f195acb25fa6b45c7b2" content="7b1f191d269920a0a02d7f195acb25fa6b45c7b2" />
 </head>
 <body>
 
@@ -17,7 +18,7 @@
     <div class="nav-container">
         <a href="#" class="nav-brand" onclick="goHome()">
             <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>
-            <span>AnimePulse</span>
+            <span>AniView</span>
         </a>
         <div class="nav-links">
             <button class="nav-link active" data-tab="home" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</button>
@@ -169,6 +170,35 @@
         <div class="schedule-week" id="scheduleGrid"></div>
     </section>
 
+    <section class="page" id="tosPage">
+        <div class="page-header">
+            <h1 class="page-title">Terms of Service</h1>
+            <p class="page-subtitle">Last updated: May 2026</p>
+        </div>
+        <div class="legal-content">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing and using AniView, you accept and agree to be bound by the terms and provisions of this agreement.</p>
+            <h2>2. Disclaimer</h2>
+            <p>AniView does not store any files on its servers. All contents are provided by non-affiliated third parties.</p>
+            <h2>3. User Conduct</h2>
+            <p>You agree to use this site responsibly and not to engage in any activity that disrupts the service or other users' experience.</p>
+        </div>
+    </section>
+    <section class="page" id="privacyPage">
+        <div class="page-header">
+            <h1 class="page-title">Privacy Policy</h1>
+            <p class="page-subtitle">Last updated: May 2026</p>
+        </div>
+        <div class="legal-content">
+            <h2>1. Information We Collect</h2>
+            <p>We only collect data that is strictly necessary to provide features like watch tracking, bookmarks, and basic account functionality.</p>
+            <h2>2. Cookies and Local Storage</h2>
+            <p>We use standard browser local storage and cookies to save your theme preferences, watch progress, and login state.</p>
+            <h2>3. Third-Party Services</h2>
+            <p>Our video players are embedded from third-party providers. We are not responsible for the privacy practices of these external services.</p>
+        </div>
+    </section>
+
     <!-- DETAIL PAGE -->
     <section class="page" id="detailPage">
         <div class="detail-container" id="detailContainer"></div>
@@ -296,7 +326,7 @@
 <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand-col">
-            <div class="footer-brand"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>AnimePulse</div>
+            <div class="footer-brand"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>AniView</div>
             <p class="footer-tagline">Your ultimate destination for high-quality streaming.</p>
             <p class="footer-disclaimer">This site does not store any files on its server. All contents are provided by non-affiliated third parties.</p>
         </div>
@@ -306,11 +336,14 @@
         </div>
         <div class="footer-links-col">
             <h4>Legal</h4>
-            <ul><li><a href="#">Terms of Service</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">DMCA</a></li></ul>
+            <ul>
+                <li><a href="#" onclick="switchTab('tos'); return false;">Terms of Service</a></li>
+                <li><a href="#" onclick="switchTab('privacy'); return false;">Privacy Policy</a></li>
+            </ul>
         </div>
     </div>
     <div class="footer-bottom">
-        <div class="footer-copyright">&copy; 2026 AnimePulse. All rights reserved.</div>
+        <div class="footer-copyright">&copy; 2026 AniView. All rights reserved.</div>
     </div>
 </footer>
 

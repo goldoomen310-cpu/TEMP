@@ -1,5 +1,5 @@
 /**
- * AnimePulse — client logic
+ * AniView — client logic
  * Source: Senshi.live API via /api/*
  */
 
@@ -522,7 +522,7 @@ function switchTab(tabId, updateRoute = true) {
     if (currentTab === 'watch' && tabId !== 'watch') { destroyHls(); if (activeVideo) { activeVideo.pause(); activeVideo = null; } }
     document.getElementById('navbar')?.classList.remove('nav-open');
     currentTab = tabId;
-    const routes = { home:'/home', trending:'/trending', seasonal:'/seasonal', schedule:'/schedule', search:'/search' };
+    const routes = { home:'/home', trending:'/trending', seasonal:'/seasonal', schedule:'/schedule', search:'/search', tos:'/tos', privacy:'/privacy' };
     if (updateRoute) setRoute(routes[tabId] || '/home');
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.tab === tabId));
     document.querySelectorAll('.bottom-nav-item').forEach(l => l.classList.toggle('active', l.dataset.tab === tabId));
@@ -2234,6 +2234,8 @@ function loadRoute() {
     if (/^\/seasonal/i.test(p))  return switchTab('seasonal', false);
     if (/^\/schedule/i.test(p))  return switchTab('schedule', false);
     if (/^\/search/i.test(p))    return switchTab('search',   false);
+    if (/^\/tos/i.test(p))       return switchTab('tos',      false);
+    if (/^\/privacy/i.test(p))   return switchTab('privacy',  false);
     return switchTab('home', false);
 }
 window.addEventListener('popstate', loadRoute);
