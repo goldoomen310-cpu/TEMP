@@ -912,57 +912,30 @@ select.auth-input option {
     background-position: right 1rem center !important;
     background-size: 14px !important;
 }
-/* --- Premium Pill-Shaped Toggle Switches (BULLETPROOF VERSION) --- */
-.premium-toggle-label {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0 0.85rem; 
-    height: 44px; 
+/* --- Simple Checkbox --- */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 44px;
+    padding: 0 0.85rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: var(--r-sm);
-    display: flex; 
-    align-items: center; 
-    gap: 0.5rem; 
-    margin: 0;
-    cursor: pointer; 
+    cursor: pointer;
     color: var(--text-sub);
-    white-space: nowrap; 
+    font-size: 0.85rem;
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
-.premium-toggle-label:has(input:checked) {
-    background: rgba(61, 180, 242, 0.1); 
-    border-color: rgba(61, 180, 242, 0.3); 
-    color: #3db4f2;
-}
-.premium-toggle-label input[type="checkbox"] {
-    display: none !important;
-}
-.toggle-slider-ui {
-    width: 36px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    position: relative;
-    flex-shrink: 0;
-    transition: background 0.3s;
-}
-.toggle-slider-ui::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
+.toggle-switch input[type="checkbox"] {
     width: 16px;
     height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.premium-toggle-label input[type="checkbox"]:checked + .toggle-slider-ui {
-    background: #3db4f2;
-}
-.premium-toggle-label input[type="checkbox"]:checked + .toggle-slider-ui::before {
-    transform: translateX(16px);
+    accent-color: #3db4f2;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
 }
 /* --- Date Input Calendar Icon Fix --- */
 .premium-input[type="date"] { color-scheme: dark; }
