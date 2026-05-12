@@ -126,6 +126,16 @@
                         <label><input type="checkbox" value="MOVIE" onchange="onMSChange(this)"> Movie</label>
                     </div>
                 </div>
+                <!-- Status -->
+                <div class="mselect-wrap" data-mselect="status"><button class="mselect-trigger" onclick="toggleMS(this)">Any Status ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="checkbox" value="RELEASING" onchange="onMSChange(this)"> Ongoing</label>
+                        <label><input type="checkbox" value="FINISHED" onchange="onMSChange(this)"> Completed</label>
+                        <label><input type="checkbox" value="NOT_YET_RELEASED" onchange="onMSChange(this)"> Not Yet Aired</label>
+                        <label><input type="checkbox" value="HIATUS" onchange="onMSChange(this)"> Hiatus</label>
+                        <label><input type="checkbox" value="CANCELLED" onchange="onMSChange(this)"> Cancelled</label>
+                    </div>
+                </div>
                 <!-- Sort -->
                 <div class="mselect-wrap" data-mselect="sort"><button class="mselect-trigger" onclick="toggleMS(this)">Default ▾</button>
                     <div class="mselect-drop">

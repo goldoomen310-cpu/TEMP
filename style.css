@@ -1234,68 +1234,91 @@ body {
 }
 
 /* =========================================
-   1. TRUE GRID (No Sliders, Responsive Columns)
+   1. PAGINATED CAROUSEL (The Sliding Rows Fix)
    ========================================= */
-.anime-carousel, .anime-grid {
+.anime-carousel {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  gap: clamp(0.5rem, 1vw, 1rem) !important;
+  padding: 0.5rem 0 1rem !important;
+}
+.anime-carousel::-webkit-scrollbar { display: none !important; }
+.carousel-btn { display: flex !important; }
+.anime-carousel .anime-card {
+  flex: 0 0 auto !important;
+  scroll-snap-align: start !important;
+  width: calc((100% - (4 * clamp(0.5rem, 1vw, 1rem))) / 5) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+@media (max-width: 960px) {
+  .anime-carousel .anime-card {
+    width: calc((100% - (3 * clamp(0.5rem, 1vw, 1rem))) / 4) !important;
+  }
+}
+@media (max-width: 600px) {
+  .anime-carousel { gap: 0.5rem !important; }
+  .anime-carousel .anime-card {
+    width: calc((100% - (2 * 0.5rem)) / 3) !important;
+  }
+}
+.anime-grid {
   display: grid !important;
   grid-template-columns: repeat(5, 1fr) !important;
   gap: clamp(0.5rem, 1vw, 1rem) !important;
-  overflow: hidden !important;
-  padding: 0.5rem 0 1rem !important;
 }
-.anime-carousel .anime-card, .anime-grid .anime-card {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  flex: none !important;
-}
-.carousel-btn { display: none !important; }
-@media (max-width: 960px) {
-  .anime-carousel, .anime-grid { grid-template-columns: repeat(4, 1fr) !important; }
-}
-@media (max-width: 600px) {
-  .anime-carousel, .anime-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem !important; }
-  .anime-card .anime-title { font-size: 0.7rem !important; }
-}
+@media (max-width: 960px) { .anime-grid { grid-template-columns: repeat(4, 1fr) !important; } }
+@media (max-width: 600px) { .anime-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.5rem !important; } }
 
 /* =========================================
-   2. MOBILE NAVBAR LAYOUT FIX
+   2. MOBILE NAVBAR ALIGNMENT FIX
    ========================================= */
 @media (max-width: 768px) {
   .nav-container {
     display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
     padding: 0 0.75rem !important;
   }
   .nav-hamburger {
-    display: flex !important;
-    order: 1 !important;
-    margin-right: 0.5rem !important;
-    padding: 0.2rem !important;
+    display: none !important;
   }
   .nav-brand {
     display: flex !important;
-    order: 2 !important;
+    order: 1 !important;
+    flex: 1 1 auto !important;
     font-size: 1.1rem !important;
+    margin: 0 !important;
   }
   .nav-search {
     display: flex !important;
-    order: 3 !important;
-    margin-left: auto !important;
-    margin-right: 0.5rem !important;
+    order: 2 !important;
+    width: auto !important;
+    margin: 0 0.25rem 0 0 !important;
+    flex-shrink: 0 !important;
   }
   .nav-search span { display: none !important; }
   .nav-search .nav-link { padding: 0.35rem !important; }
   .nav-auth {
     display: flex !important;
-    order: 4 !important;
-    margin-left: 0 !important;
+    order: 3 !important;
+    width: auto !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
   }
 }
 
 /* =========================================
-   3. SPOTLIGHT IMAGE FIX
+   3. MOBILE OVERRIDES
    ========================================= */
-.spotlight-slide {
-  background-position: center center !important;
+@media (max-width: 768px) {
+  .carousel-btn { display: none !important; }
 }

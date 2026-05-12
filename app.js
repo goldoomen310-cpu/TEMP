@@ -708,16 +708,22 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
     const carousel = document.getElementById(id);
     if (!carousel || !allData) return;
 
-    // Already initialized – update stored data and re-render current page
+    const isMobile = window.innerWidth < 768;
+
+    // Already initialized – update stored data and re-render
     if (carousel.dataset.cInit) {
         const state = _carouselData.get(id);
         if (state) {
-            const totalPages = Math.max(1, Math.ceil(allData.length / 6));
             state.data = allData;
-            state.totalPages = totalPages;
             state.renderFn = renderFn;
-            if (state.page >= totalPages) state.page = totalPages - 1;
-            renderCarouselPage(id);
+            if (isMobile) {
+                carousel.innerHTML = allData.map(renderFn).join('');
+            } else {
+                const totalPages = Math.max(1, Math.ceil(allData.length / 6));
+                state.totalPages = totalPages;
+                if (state.page >= totalPages) state.page = totalPages - 1;
+                renderCarouselPage(id);
+            }
         }
         return;
     }
@@ -731,9 +737,6 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
         wrap.appendChild(carousel);
     }
 
-    const totalPages = Math.max(1, Math.ceil(allData.length / 6));
-    _carouselData.set(id, { data: allData, page: 0, totalPages, renderFn });
-
     const leftBtn = document.createElement('button');
     leftBtn.className = 'carousel-btn carousel-btn-left';
     leftBtn.setAttribute('aria-label', 'Previous');
@@ -746,6 +749,18 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
 
     wrap.appendChild(leftBtn);
     wrap.appendChild(rightBtn);
+
+    if (isMobile) {
+        leftBtn.style.display = 'none';
+        rightBtn.style.display = 'none';
+        const totalPages = 1;
+        _carouselData.set(id, { data: allData, page: 0, totalPages, renderFn });
+        carousel.innerHTML = allData.map(renderFn).join('');
+        return;
+    }
+
+    const totalPages = Math.max(1, Math.ceil(allData.length / 6));
+    _carouselData.set(id, { data: allData, page: 0, totalPages, renderFn });
 
     function syncArrowVisibility(state) {
         leftBtn.style.display = state.page <= 0 ? 'none' : '';
