@@ -489,61 +489,66 @@
 </script>
 <script src="/app.js"></script>
 <div class="modal-overlay" id="anilistModal" onclick="if(event.target===this)closeAnilistModal()">
-    <div class="ep-modal-content" style="max-width:450px">
-        <div class="ep-modal-header">
-            <h3>AniList</h3>
+    <div class="ep-modal-content" style="max-width:450px; background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg) 100%); border: 1px solid rgba(61, 180, 242, 0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(61, 180, 242, 0.1);">
+        <div class="ep-modal-header" style="border-bottom: 1px solid rgba(61, 180, 242, 0.15); background: rgba(61, 180, 242, 0.05);">
+            <h3 style="color: #3db4f2; display: flex; align-items: center; gap: 0.65rem;">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M6.36 18.94L3.48 4.09H7.6l1.7 8.92h5.11V4.09h3.76v14.85h-11.8z"/></svg>
+                AniList Status
+            </h3>
             <button class="ep-modal-close" onclick="closeAnilistModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
-        <div class="anilist-modal-body">
-            <div class="auth-field">
+        <div class="anilist-modal-body" style="padding: 1.5rem 1.75rem 2rem;">
+            <div class="auth-field" style="margin-bottom:1.25rem;">
                 <label>Status</label>
-                <div class="custom-select-wrap">
-                    <div class="custom-select-trigger" id="alModalStatusTrigger" tabindex="0" role="combobox" aria-expanded="false">
-                        <span id="alModalStatusText">Auto (Default)</span>
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" class="select-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+                <div class="custom-dropdown" id="statusDropdown">
+                    <div class="custom-dropdown-trigger" onclick="toggleCustomDropdown('statusDropdown')">
+                        <span id="statusDropdownText">Auto (Default)</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
-                    <select id="alModalStatus" style="display:none">
-                        <option value="AUTO">Auto (Default)</option>
-                        <option value="CURRENT">Watching</option>
-                        <option value="PLANNING">Plan to watch</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="REPEATING">Rewatching</option>
-                        <option value="PAUSED">Paused</option>
-                        <option value="DROPPED">Dropped</option>
-                    </select>
-                    <div class="custom-select-options" id="alModalStatusOptions">
-                        <button type="button" data-value="AUTO">Auto (Default)</button>
-                        <button type="button" data-value="CURRENT">Watching</button>
-                        <button type="button" data-value="PLANNING">Plan to watch</button>
-                        <button type="button" data-value="COMPLETED">Completed</button>
-                        <button type="button" data-value="REPEATING">Rewatching</button>
-                        <button type="button" data-value="PAUSED">Paused</button>
-                        <button type="button" data-value="DROPPED">Dropped</button>
+                    <div class="custom-dropdown-options">
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'AUTO', 'Auto (Default)')">Auto (Default)</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'CURRENT', 'Watching')">Watching</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'PLANNING', 'Plan to watch')">Plan to watch</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'COMPLETED', 'Completed')">Completed</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'REPEATING', 'Rewatching')">Rewatching</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'PAUSED', 'Paused')">Paused</div>
+                        <div class="custom-option" onclick="selectCustomOption('statusDropdown', 'DROPPED', 'Dropped')">Dropped</div>
                     </div>
+                    <input type="hidden" id="alModalStatus" value="AUTO">
                 </div>
             </div>
-            <div class="auth-field">
-                <label>Score (0-5)</label>
-                <input type="number" id="alModalScore" class="auth-input" min="0" max="5" step="0.5" placeholder="e.g. 4.5">
+            <div class="auth-field" style="margin-bottom:1.25rem;">
+                <label style="color:var(--text-sub); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px;">Score (0-5 Stars)</label>
+                <input type="number" id="alModalScore" class="auth-input premium-input" min="0" max="5" step="0.5" placeholder="e.g. 4.5">
             </div>
-            <div class="auth-field">
-                <label>Episode Progress</label>
-                <div class="inline-group">
-                    <input type="number" id="alModalProgress" class="auth-input" min="0" placeholder="0">
-                    <label class="checkbox-label"><input type="checkbox" id="alModalProgAuto" checked> Auto</label>
+            <div class="auth-field" style="margin-bottom:1.25rem;">
+                <label style="color:var(--text-sub); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px;">Episode Progress</label>
+                <div class="inline-group" style="display:flex; gap:0.75rem; align-items:center;">
+                    <input type="number" id="alModalProgress" class="auth-input premium-input" style="flex:1;" min="0" placeholder="0">
+                    <label class="premium-toggle-label">
+                        <input type="checkbox" id="alModalProgAuto" checked> Auto
+                    </label>
                 </div>
             </div>
-            <div class="auth-field">
-                <label>Total Rewatches</label>
-                <div class="inline-group">
-                    <input type="number" id="alModalRewatches" class="auth-input" min="0" placeholder="0">
-                    <label class="checkbox-label"><input type="checkbox" id="alModalRewatchAuto" checked> Auto</label>
+            <div class="auth-field" style="margin-bottom:1.25rem;">
+                <label style="color:var(--text-sub); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px;">Total Rewatches</label>
+                <div class="inline-group" style="display:flex; gap:0.75rem; align-items:center;">
+                    <input type="number" id="alModalRewatches" class="auth-input premium-input" style="flex:1;" min="0" placeholder="0">
+                    <label class="premium-toggle-label">
+                        <input type="checkbox" id="alModalRewatchAuto" checked> Auto
+                    </label>
                 </div>
             </div>
-            <div class="auth-field">
-                <div class="date-group">
-                    <label>Start Date <input type="date" id="alModalStart" class="auth-input"></label>
-                    <label>Finish Date <input type="date" id="alModalFinish" class="auth-input"></label>
+            <div class="auth-field" style="margin-bottom:1.25rem;">
+                <div class="date-group" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        <label style="color:var(--text-sub); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px;">Start Date</label>
+                        <input type="date" id="alModalStart" class="auth-input premium-input" style="margin-top:0.4rem;">
+                    </div>
+                    <div>
+                        <label style="color:var(--text-sub); text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px;">Finish Date</label>
+                        <input type="date" id="alModalFinish" class="auth-input premium-input" style="margin-top:0.4rem;">
+                    </div>
                 </div>
             </div>
             <button class="anilist-modal-save" onclick="saveAnilistModal()">Save to AniList</button>
