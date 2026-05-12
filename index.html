@@ -368,15 +368,30 @@
     window.API_BASE = BASE;
 })();
 (function(){
-  var detected = false;
-  function kill() { if (detected) return; detected = true; location.reload(); }
-  (function(){
-    var nativeLog = console.log.bind(console);
-    function makeTrap() { if (detected) return; var el = document.createElement('div'); Object.defineProperty(el, 'id', { get: kill, configurable: false }); nativeLog(el); }
-    makeTrap(); setInterval(makeTrap, 500);
-  })();
-  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  setTimeout(function(){ ['log','warn','error','info','debug','trace'].forEach(function(m){ console[m] = function(){}; }); setInterval(function(){ console.clear(); }, 2000); }, 3000);
+    // 1. Disable right-click menu
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    // 2. Disable common DevTools keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U)
+    document.addEventListener('keydown', function(e) {
+        if (e.keyCode === 123 ||
+            (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+            (e.ctrlKey && e.keyCode === 85)) {
+            e.preventDefault();
+        }
+    });
+    // 3. The Aggressive Loop: Constantly clear the console
+    setInterval(function(){ console.clear(); }, 100);
+    // 4. The Trap: Detect if DevTools is actually open and force a reload
+    setInterval(function() {
+        var start = new Date().getTime();
+        debugger;
+        var end = new Date().getTime();
+        if (end - start > 100) {
+            console.clear();
+            window.location.reload();
+        }
+    }, 500);
+    // 5. Overwrite native console logging methods to prevent variable inspection
+    setTimeout(function(){ ['log','warn','error','info','debug','trace'].forEach(function(m){ console[m] = function(){}; }); }, 1000);
 })();
 </script>
 <script src="/app.js"></script>
