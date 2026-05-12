@@ -264,6 +264,16 @@
                     <p>Sync your watch list automatically. We will only import anime you are currently watching or planning to watch (Completed anime are hidden).</p>
                     <button class="btn btn-anilist" id="anilistAuthBtn" onclick="initiateAnilistAuth()">Authorize AniList</button>
                     <p id="anilistStatusText" class="anilist-status"></p>
+                    <div class="anilist-settings-toggles" id="anilistToggles" style="display:none; margin-top:1.5rem; text-align:left; border-top:1px solid var(--border); padding-top:1rem;">
+                        <label style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; color:var(--text);">
+                            <span><strong>Auto-update anime progress</strong><br><small style="color:var(--text-sub);">Updates progress when you reach the 5-minute mark</small></span>
+                            <input type="checkbox" id="anilistAutoUpdate" checked onchange="saveAnilistSettings()">
+                        </label>
+                        <label style="display:flex; align-items:center; justify-content:space-between; color:var(--text);">
+                            <span><strong>Display AniList in Homepage</strong><br><small style="color:var(--text-sub);">Shows your Watchlist row</small></span>
+                            <input type="checkbox" id="anilistShowRow" checked onchange="saveAnilistSettings()">
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>

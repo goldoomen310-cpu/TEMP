@@ -1457,3 +1457,12 @@ html, body {
 .btn-anilist { background:#3db4f2; color:#fff; font-weight:700; padding:0.75rem 2rem; border-radius:var(--r-md); border:none; font-size:1rem; transition:0.2s; cursor:pointer; }
 .btn-anilist:hover { background:#2a9cd6; transform:translateY(-2px); }
 .anilist-status { margin-top:1rem; font-size:0.85rem; font-weight:600; color:#10b981; }
+.anilist-settings-toggles input[type="checkbox"] { width:40px; height:20px; appearance:none; background:#333; border-radius:20px; position:relative; cursor:pointer; outline:none; transition:0.3s; flex-shrink:0; }
+.anilist-settings-toggles input[type="checkbox"]:checked { background:#3db4f2; }
+.anilist-settings-toggles input[type="checkbox"]::before { content:''; position:absolute; width:16px; height:16px; border-radius:50%; top:2px; left:2px; background:white; transition:0.3s; }
+.anilist-settings-toggles input[type="checkbox"]:checked::before { transform:translateX(20px); }
+.anilist-dropdown { background:rgba(61,180,242,0.1); border:1px solid #3db4f2; color:#3db4f2; font-weight:600; padding:0.75rem 1rem; border-radius:var(--r-md); cursor:pointer; appearance:none; padding-right:2.5rem; }
+.anilist-dropdown:hover { background:rgba(61,180,242,0.2); }
+.anilist-dropdown option { background:var(--bg-card); color:var(--text); }
+.anilist-status-wrapper { display:none; position:relative; }
+.anilist-status-wrapper::after { content:"▼"; position:absolute; right:1rem; top:50%; transform:translateY(-50%); color:#3db4f2; pointer-events:none; font-size:0.7rem; }

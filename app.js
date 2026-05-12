@@ -1225,11 +1225,22 @@ async function viewAnimeDetails(id) {
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="15 18 9 12 15 6"/></svg>
                                 Back
                             </button>
-                            <button class="btn btn-primary" onclick='startStreaming(${JSON.stringify(String(id))}, "sub")'>
+                            <button class="btn btn-primary" id="btnPlayDetail" data-anime-id="${esc(anime.malId || '')}" onclick='startStreaming(${JSON.stringify(String(id))}, "sub")'>
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><polygon points="5,3 19,12 5,21"/></svg>
                                 Watch Sub
                             </button>
                             ${hasDub ? `<button class="btn btn-ghost" onclick='startStreaming(${JSON.stringify(String(id))}, "dub")'>Watch Dub</button>` : ''}
+                            <div class="anilist-status-wrapper" id="anilistStatusWrapper" style="display:none; position:relative;">
+                                <select id="anilistStatusSelect" class="btn anilist-dropdown" onchange='updateAnilistStatus(this.value, ${esc(anime.malId || '')})'>
+                                    <option value="" disabled selected>Add to List</option>
+                                    <option value="CURRENT">Watching</option>
+                                    <option value="PLANNING">Plan to watch</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="REPEATING">Rewatching</option>
+                                    <option value="PAUSED">Paused</option>
+                                    <option value="DROPPED">Dropped</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1269,6 +1280,7 @@ async function viewAnimeDetails(id) {
                     <strong>Episode ${esc(String(anime.nextAiringEpisode.episode))}</strong> airing <span class="next-ep-countdown" data-airing="${anime.nextAiringEpisode.airingAt}"></span>
                 </div>
             </div>` : ''}`;
+        showAnilistStatusDropdown();
 
         // Start tickers for countdowns (dd:hh:mm:ss)
         document.querySelectorAll('.next-ep-countdown').forEach(cd => {
@@ -1737,6 +1749,7 @@ async function playEpisode(index, _element) {
     const epFilter = document.getElementById('wpEpFilter');
     if (epFilter) epFilter.value = '';
     renderEpisodeList();
+    resetAnilistProgress();
     activeStreamIndex = 0;
     currentStreams = [];
     if (currentAnimeId) {
@@ -2218,6 +2231,7 @@ function attachVideoControls(video) {
         if (timeCur) timeCur.innerText = fmtTime(video.currentTime);
         if (pFill)   pFill.style.width = d ? `${(video.currentTime/d)*100}%` : '0%';
         handleSkipState(video);
+        checkAnilistAutoUpdate(video.currentTime);
         // Save progress every ~30s
         _progTick++;
         if (_progTick % 30 === 0) saveCurrentProgress();
@@ -2379,6 +2393,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     initSidebarGenres();
     updateAnilistStatus();
+    restoreAnilistSettings();
     // Auth button — toggle user menu on click when logged in
     document.getElementById('authBtn')?.addEventListener('click', e => {
         if (currentUser) {
@@ -2545,6 +2560,7 @@ function initiateAnilistAuth() {
         if (data.access_token) {
             localStorage.setItem('anilist_token', data.access_token);
             updateAnilistStatus();
+            restoreAnilistSettings();
             switchTab('home');
             fetchAnilistWatchlist();
         }
@@ -2632,4 +2648,98 @@ async function fetchAnilistWatchlist() {
     } catch (e) {
         console.error('Failed to fetch AniList', e);
     }
+}
+
+// ─── ANILIST SETTINGS ─────────────────────────────────────────────────────────
+function saveAnilistSettings() {
+    localStorage.setItem('anilist_auto_update', document.getElementById('anilistAutoUpdate').checked);
+    localStorage.setItem('anilist_show_row', document.getElementById('anilistShowRow').checked);
+    const show = document.getElementById('anilistShowRow').checked && localStorage.getItem('anilist_token');
+    const sec = document.getElementById('anilistWatchingSection');
+    if (sec) sec.style.display = show ? 'block' : 'none';
+}
+
+function restoreAnilistSettings() {
+    if (!localStorage.getItem('anilist_token')) return;
+    const toggles = document.getElementById('anilistToggles');
+    if (toggles) toggles.style.display = 'block';
+    const auto = document.getElementById('anilistAutoUpdate');
+    if (auto) auto.checked = localStorage.getItem('anilist_auto_update') !== 'false';
+    const show = document.getElementById('anilistShowRow');
+    if (show) show.checked = localStorage.getItem('anilist_show_row') !== 'false';
+}
+
+// ─── ANILIST STATUS DROPDOWN ON DETAIL PAGE ───────────────────────────────────
+function showAnilistStatusDropdown() {
+    const wrapper = document.getElementById('anilistStatusWrapper');
+    if (wrapper && localStorage.getItem('anilist_token')) wrapper.style.display = '';
+}
+
+// ─── NOTIFICATION TOAST ───────────────────────────────────────────────────────
+function showAnilistNotification(msg) {
+    const d = document.createElement('div');
+    d.textContent = msg;
+    d.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#3db4f2;color:#fff;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:bold;box-shadow:0 4px 12px rgba(0,0,0,0.3);animation:slideUp 0.3s ease forwards;';
+    document.body.appendChild(d);
+    setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 300); }, 3000);
+}
+
+// ─── ANILIST STATUS MUTATION ──────────────────────────────────────────────────
+async function updateAnilistStatus(status, malId) {
+    const token = localStorage.getItem('anilist_token');
+    if (!token || !malId) return;
+    showAnilistNotification('Updating anime status...');
+    try {
+        const query = `query { Media(idMal: ${malId}, type: ANIME) { id } }`;
+        const r = await fetch('https://graphql.anilist.co', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ query })
+        });
+        const d = await r.json();
+        const aid = d.data?.Media?.id;
+        if (!aid) { showAnilistNotification('Could not find anime on AniList.'); return; }
+        const mutation = `mutation ($mediaId: Int, $status: MediaListStatus) { SaveMediaListEntry(mediaId: $mediaId, status: $status) { id status } }`;
+        const mr = await fetch('https://graphql.anilist.co', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: mutation, variables: { mediaId: aid, status } })
+        });
+        if (mr.ok) showAnilistNotification("AniList status updated!");
+        else showAnilistNotification("Failed to update status.");
+    } catch { showAnilistNotification("Error updating status."); }
+}
+
+// ─── ANILIST AUTO PROGRESS ────────────────────────────────────────────────────
+let _anilistProgressUpdated = false;
+
+function resetAnilistProgress() { _anilistProgressUpdated = false; }
+
+function checkAnilistAutoUpdate(currentTime) {
+    const token = localStorage.getItem('anilist_token');
+    if (!token || localStorage.getItem('anilist_auto_update') === 'false') return;
+    if (_anilistProgressUpdated || currentTime < 300) return;
+    _anilistProgressUpdated = true;
+    const detail = currentAnimeDetail;
+    const malId = detail?.malId;
+    const ep = currentEpisodes[currentEpisodeIndex];
+    if (!malId || !ep) return;
+    updateAnilistProgress(malId, ep.number);
+}
+
+async function updateAnilistProgress(malId, epNumber) {
+    const token = localStorage.getItem('anilist_token');
+    if (!token) return;
+    try {
+        const query = `query { Media(idMal: ${malId}, type: ANIME) { id } }`;
+        const r = await fetch('https://graphql.anilist.co', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ query })
+        });
+        const d = await r.json();
+        const aid = d.data?.Media?.id;
+        if (!aid) return;
+        const mutation = `mutation ($mediaId: Int, $progress: Int) { SaveMediaListEntry(mediaId: $mediaId, progress: $progress) { id progress } }`;
+        await fetch('https://graphql.anilist.co', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: mutation, variables: { mediaId: aid, progress: parseInt(epNumber) } })
+        });
+        showAnilistNotification(`AniList: Watched Ep ${epNumber}`);
+    } catch {}
 }
