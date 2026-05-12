@@ -691,6 +691,16 @@ function spotlightPrev() {
     spotlightGo((_spotIdx - 1 + _spotItems.length) % _spotItems.length);
 }
 
+// ─── Countdown formatter ─────────────────────────────────────────────────────
+function formatCountdown(totalSeconds) {
+    const d = Math.floor(totalSeconds / (3600 * 24));
+    const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = Math.floor(totalSeconds % 60);
+    const pad = (num) => num.toString().padStart(2, '0');
+    return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
 // ─── Carousel pagination (6 per page) ────────────────────────────────────────
 const _carouselData = new Map();
 
@@ -1201,16 +1211,15 @@ async function viewAnimeDetails(id) {
                 </div>
             </div>` : ''}`;
 
-        // Start tickers for countdowns
+        // Start tickers for countdowns (dd:hh:mm:ss)
         document.querySelectorAll('.next-ep-countdown').forEach(cd => {
             function tick() {
                 const left = Math.max(0, (Number(cd.dataset.airing) * 1000) - Date.now());
                 if (left <= 0) { cd.textContent = 'now'; return; }
-                const d = Math.floor(left/86400000), h = Math.floor((left%86400000)/3600000), m = Math.floor((left%3600000)/60000);
-                cd.textContent = d ? `in ${d}d ${h}h ${m}m` : h ? `in ${h}h ${m}m` : `in ${m}m`;
+                cd.textContent = formatCountdown(Math.floor(left / 1000));
             }
             tick();
-            setInterval(tick, 60000);
+            setInterval(tick, 1000);
         });
 
         // Render episode grid
@@ -1269,17 +1278,16 @@ async function viewAnimeDetails(id) {
                 <div class="next-ep-info">
                     <strong>Episode ${esc(String(ne.episode))}</strong> airing <span class="next-ep-countdown" data-airing="${ne.airingAt}"></span>
                 </div>`;
-            // Start countdown
+            // Start countdown (dd:hh:mm:ss)
             const cd = nextEpContainer.querySelector('.next-ep-countdown');
             if (cd) {
                 function tick() {
                     const left = Math.max(0, (Number(cd.dataset.airing) * 1000) - Date.now());
                     if (left <= 0) { cd.textContent = 'now'; return; }
-                    const d = Math.floor(left/86400000), h = Math.floor((left%86400000)/3600000), m = Math.floor((left%3600000)/60000);
-                    cd.textContent = d ? `in ${d}d ${h}h ${m}m` : h ? `in ${h}h ${m}m` : `in ${m}m`;
+                    cd.textContent = formatCountdown(Math.floor(left / 1000));
                 }
                 tick();
-                setInterval(tick, 60000);
+                setInterval(tick, 1000);
             }
         }
 
@@ -1393,9 +1401,7 @@ async function fetchAnilistEnrich(title) {
         if (data?.nextAiringEpisode) {
             const n = data.nextAiringEpisode;
             const secs = n.timeUntilAiring;
-            const days = Math.floor(secs / 86400);
-            const hrs = Math.floor((secs % 86400) / 3600);
-            let timeStr = days > 0 ? `${days}d ${hrs}h` : `${hrs}h ${Math.floor((secs % 3600) / 60)}m`;
+            const timeStr = formatCountdown(secs);
             const container = document.getElementById('watchNextEpContainer');
             if (container) {
                 container.style.display = '';
