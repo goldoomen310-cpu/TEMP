@@ -180,7 +180,7 @@ img { display:block; }
   display:grid; grid-template-columns:1fr 300px;
   gap:clamp(1.25rem, 3vw, 4rem); max-width:min(94vw, 1600px); margin:0 auto; padding:0 clamp(0.75rem, 2vw, 3rem);
 }
-.home-main { display:flex; flex-direction:column; }
+.home-main { display:flex; flex-direction:column; min-width:0; }
 .home-sidebar { position:sticky; top:88px; align-self:start; }
 
 .sidebar-card {
