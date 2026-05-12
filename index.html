@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimePulse - Watch Anime</title>
+    <meta name="description" content="Watch anime online.">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-brand" onclick="goHome()">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>
+            <span>AnimePulse</span>
+        </a>
+        <div class="nav-links">
+            <button class="nav-link active" data-tab="home" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</button>
+            <button class="nav-link" data-tab="trending" onclick="switchTab('trending')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Trending</button>
+            <button class="nav-link" data-tab="seasonal" onclick="switchTab('seasonal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Seasonal</button>
+            <button class="nav-link" data-tab="schedule" onclick="switchTab('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Schedule</button>
+        </div>
+        <div class="nav-search">
+            <button class="nav-link" data-tab="search" onclick="switchTab('search')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
+        </div>
+        <div class="nav-auth" id="navAuth">
+            <button class="btn btn-primary btn-sm auth-btn" id="authBtn" onclick="openAuthModal()"><span id="authBtnLabel">Sign In</span></button>
+        </div>
+        <button class="nav-hamburger" id="navHamburger" onclick="toggleNav()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+</nav>
+
+<main class="main-content" id="mainContent">
+    <!-- HOME PAGE -->
+    <section class="page active" id="homePage">
+        <div class="spotlight" id="spotlight" style="display:none">
+            <div class="spotlight-slides" id="spotlightSlides"></div>
+            <button class="spotlight-arrow spotlight-prev" onclick="spotlightPrev()"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><polygon points="15,18 9,12 15,6"/></svg></button>
+            <button class="spotlight-arrow spotlight-next" onclick="spotlightNext()"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><polygon points="9,6 15,12 9,18"/></svg></button>
+            <div class="spotlight-dots" id="spotlightDots"></div>
+        </div>
+        <div class="home-layout">
+            <div class="home-main">
+                <div class="content-section" id="continueWatchingSection" style="display:none">
+                    <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Continue Watching</h2></div>
+                    <div class="anime-carousel" id="continueWatchingCarousel"></div>
+                </div>
+                <div class="content-section">
+                    <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Trending Now</h2></div>
+                    <div class="anime-carousel" id="discoverTrending"></div>
+                </div>
+                <div class="content-section">
+                    <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Popular This Season</h2></div>
+                    <div class="anime-carousel" id="discoverPopularSeason"></div>
+                </div>
+                <div class="content-section">
+                    <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Upcoming Next Season</h2></div>
+                    <div class="anime-carousel" id="discoverUpcoming"></div>
+                </div>
+                <div class="content-section">
+                    <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>All Time Popular</h2></div>
+                    <div class="anime-carousel" id="discoverAlltime"></div>
+                </div>
+            </div>
+            <aside class="home-sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Top 10 Trending</div>
+                    <div class="trending-list" id="sidebarTrendingList">
+                        <div class="empty-sidebar">Loading trending...</div>
+                    </div>
+                </div>
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Browse Genres</div>
+                    <div class="genre-chips" id="sidebarGenres"></div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- SEARCH PAGE -->
+    <section class="page" id="searchPage">
+        <div class="page-header" style="margin-bottom:2rem">
+            <h1 class="page-title" id="searchResultTitle">Browse Anime</h1>
+            <p class="page-subtitle" id="searchResultCount">Find exactly what you're looking for</p>
+            <div class="search-controls">
+                <div class="search-field"><input type="text" id="advSearchInput" class="search-input" placeholder="Search by title…" onkeydown="if(event.key==='Enter') executeSearch()"></div>
+                <button class="btn btn-primary search-submit" onclick="executeSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="margin-right:0.4rem;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
+            </div>
+            <div class="search-filters" id="searchFilters">
+                <!-- Genre -->
+                <div class="mselect-wrap" data-mselect="genre"><button class="mselect-trigger" onclick="toggleMS(this)">All Genres ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="checkbox" value="Action" onchange="onMSChange(this)"> Action</label>
+                        <label><input type="checkbox" value="Adventure" onchange="onMSChange(this)"> Adventure</label>
+                        <label><input type="checkbox" value="Comedy" onchange="onMSChange(this)"> Comedy</label>
+                        <label><input type="checkbox" value="Drama" onchange="onMSChange(this)"> Drama</label>
+                        <label><input type="checkbox" value="Fantasy" onchange="onMSChange(this)"> Fantasy</label>
+                        <label><input type="checkbox" value="Horror" onchange="onMSChange(this)"> Horror</label>
+                        <label><input type="checkbox" value="Romance" onchange="onMSChange(this)"> Romance</label>
+                        <label><input type="checkbox" value="Sci-Fi" onchange="onMSChange(this)"> Sci-Fi</label>
+                    </div>
+                </div>
+                <!-- Year -->
+                <div class="mselect-wrap" data-mselect="year"><button class="mselect-trigger" onclick="toggleMS(this)">Any Year ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="checkbox" value="2026" onchange="onMSChange(this)"> 2026</label>
+                        <label><input type="checkbox" value="2025" onchange="onMSChange(this)"> 2025</label>
+                        <label><input type="checkbox" value="2024" onchange="onMSChange(this)"> 2024</label>
+                    </div>
+                </div>
+                <!-- Season -->
+                <div class="mselect-wrap" data-mselect="season"><button class="mselect-trigger" onclick="toggleMS(this)">Any Season ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="checkbox" value="WINTER" onchange="onMSChange(this)"> Winter</label>
+                        <label><input type="checkbox" value="SPRING" onchange="onMSChange(this)"> Spring</label>
+                        <label><input type="checkbox" value="SUMMER" onchange="onMSChange(this)"> Summer</label>
+                        <label><input type="checkbox" value="FALL" onchange="onMSChange(this)"> Fall</label>
+                    </div>
+                </div>
+                <!-- Format -->
+                <div class="mselect-wrap" data-mselect="format"><button class="mselect-trigger" onclick="toggleMS(this)">All Types ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="checkbox" value="TV" onchange="onMSChange(this)"> TV</label>
+                        <label><input type="checkbox" value="MOVIE" onchange="onMSChange(this)"> Movie</label>
+                    </div>
+                </div>
+                <!-- Sort -->
+                <div class="mselect-wrap" data-mselect="sort"><button class="mselect-trigger" onclick="toggleMS(this)">Default ▾</button>
+                    <div class="mselect-drop">
+                        <label><input type="radio" name="ms-sort" value="" onchange="onMSChange(this)" checked> Default</label>
+                        <label><input type="radio" name="ms-sort" value="trending" onchange="onMSChange(this)"> Trending</label>
+                        <label><input type="radio" name="ms-sort" value="popular" onchange="onMSChange(this)"> Popular</label>
+                        <label><input type="radio" name="ms-sort" value="score" onchange="onMSChange(this)"> Score</label>
+                        <label><input type="radio" name="ms-sort" value="recent" onchange="onMSChange(this)"> Recently Added</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="anime-grid" id="searchGrid"></div>
+        <div class="load-more-container"><button class="btn btn-ghost" id="loadMoreSearch" style="display:none" onclick="loadMoreSearch()">Load More</button></div>
+    </section>
+
+    <!-- TRENDING PAGE -->
+    <section class="page" id="trendingPage">
+        <div class="page-header">
+            <h1 class="page-title">Trending Anime</h1>
+            <p class="page-subtitle">Anime sorted by trending</p>
+        </div>
+        <div class="anime-grid" id="trendingGrid"></div>
+        <div class="load-more-container"><button class="btn btn-outline" id="loadMoreTrending" onclick="loadMoreTrending()">Load More</button></div>
+    </section>
+
+    <!-- SEASONAL PAGE -->
+    <section class="page" id="seasonalPage">
+        <div class="page-header">
+            <h1 class="page-title">Seasonal Anime</h1>
+            <p class="page-subtitle">What's airing this season</p>
+        </div>
+        <div class="anime-grid" id="seasonalGrid"></div>
+    </section>
+
+    <!-- SCHEDULE PAGE -->
+    <section class="page" id="schedulePage">
+        <div class="page-header">
+            <h1 class="page-title">Schedule</h1>
+            <p class="page-subtitle">Upcoming episode airing times</p>
+        </div>
+        <div class="schedule-week" id="scheduleGrid"></div>
+    </section>
+
+    <!-- DETAIL PAGE -->
+    <section class="page" id="detailPage">
+        <div class="detail-container" id="detailContainer"></div>
+        <div class="episodes-section" id="episodesSection" style="display:none">
+            <div class="episodes-section-header">
+                <h2>Episodes</h2><span id="episodesSectionCount"></span>
+                <input type="text" class="ep-filter-input" id="epFilterInput" placeholder="Filter episodes…" oninput="filterEpisodes(this.value)">
+            </div>
+            <div class="episodes-grid" id="episodesGrid"></div>
+        </div>
+    </section>
+
+    <!-- WATCH PAGE -->
+    <section class="page watch-page" id="watchPage">
+        <div class="wp-cinema">
+            <div class="wp-cinema-inner">
+                <div class="wp-top-bar">
+                    <button class="wp-back-btn" onclick="closePlayer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+                    <span class="wp-status-pill" id="playerStatus">Loading</span>
+                    <h2 class="wp-now-playing" id="playerAnimeTitle">Anime</h2>
+                </div>
+                <div class="wp-video-area"><div class="wp-video-container" id="videoContainer"></div></div>
+                <div class="wp-cinema-bar" id="cinemaBar">
+                    <div class="cinema-bar-inner">
+                        <button class="cinema-btn" id="focusBtn" title="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>Fullscreen</button>
+                        <span class="cinema-sep">|</span>
+                        <label class="cinema-toggle" title="Auto-next episode"><span>Auto Next</span><input type="checkbox" id="stripAutoNext" checked><span class="cinema-slider"></span></label>
+                        <label class="cinema-toggle" title="Autoplay"><span>Auto Play</span><input type="checkbox" id="stripAutoPlay" checked><span class="cinema-slider"></span></label>
+                        <label class="cinema-toggle" title="Auto-skip intro/outro"><span>Auto Skip</span><input type="checkbox" id="stripAutoSkip" checked><span class="cinema-slider"></span></label>
+                        <span class="cinema-sep">|</span>
+                        <button class="cinema-btn" id="prevEpBtn" title="Previous episode"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"/></svg>Prev</button>
+                        <button class="cinema-btn" id="cinemaNextBtn" title="Next episode"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"/></svg>Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="wp-server-strip" id="serverStrip">
+            <div class="wp-server-strip-head">
+                <h4 class="wp-card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Server</h4>
+                <div class="lang-toggle" id="langToggle">
+                    <button class="lang-toggle-btn active" data-lang="sub" onclick="switchLang('sub')">Sub</button>
+                    <button class="lang-toggle-btn" data-lang="dub" onclick="switchLang('dub')">Dub</button>
+                </div>
+            </div>
+            <div class="server-picker" id="serverPicker"></div>
+        </div>
+        <div class="wp-content-row">
+            <div class="wp-info-col">
+                <div class="wp-info-card" id="watchDetailsContainer"></div>
+                <div class="wp-cast-card" id="watchCastContainer" style="display:none"></div>
+                <div class="wp-next-ep-card" id="watchNextEpContainer" style="display:none"></div>
+                <div class="wp-comments-card" id="watchCommentsSection" style="display:none">
+                    <h4 class="wp-card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Comments</h4>
+                    <div class="comments-container" id="commentsContainer"><div class="comments-empty">No comments yet. <button class="comments-signin-btn" onclick="openAuthModal()">Sign in</button> to post one.</div></div>
+                    <div class="comments-form" id="commentsForm"><textarea class="comments-textarea" id="commentInput" placeholder="Write a comment…" maxlength="2000" rows="3"></textarea><button class="btn btn-primary btn-sm comments-submit" onclick="postComment()">Post</button></div>
+                </div>
+            </div>
+            <div class="wp-episodes-col">
+                <div class="wp-episodes-card">
+                    <div class="wp-episodes-header">
+                        <h4 class="wp-card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>Episodes</h4>
+                        <div class="wp-ep-header-right"><span class="wp-ep-count" id="episodesCount">0</span><button class="wp-see-all-btn" id="seeAllEpisodesBtn" onclick="openEpisodeModal()">See All</button></div>
+                    </div>
+                    <div class="wp-ep-filter-wrap"><input type="text" class="ep-filter-input" id="wpEpFilter" placeholder="Search episodes…" oninput="filterWatchEpisodes(this.value)"></div>
+                    <div class="wp-episodes-list" id="episodesList"></div>
+                </div>
+            </div>
+        </div>
+        <div class="wp-more-section" id="moreLikeThis" style="display:none">
+            <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>More Like This</h2></div>
+            <div class="anime-carousel" id="moreLikeThisCarousel"></div>
+        </div>
+    </section>
+</main>
+
+<div class="modal-overlay" id="episodeModal" onclick="if(event.target===this)closeEpisodeModal()">
+    <div class="ep-modal-content">
+        <div class="ep-modal-header">
+            <h3>All Episodes</h3>
+            <div class="ep-modal-header-right">
+                <input type="text" class="ep-modal-filter" id="epModalFilter" placeholder="Search episodes…" oninput="filterModalEpisodes(this.value)">
+                <button class="ep-modal-close" onclick="closeEpisodeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+        </div>
+        <div class="ep-modal-grid" id="episodeModalGrid"></div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="loader"></div></div>
+
+<div class="auth-modal-overlay" id="authModal" onclick="if(event.target===this)closeAuthModal()">
+    <div class="auth-modal">
+        <div class="auth-modal-header">
+            <h3 id="authModalTitle">Sign In</h3>
+            <button class="auth-modal-close" onclick="closeAuthModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div class="auth-modal-body" id="authModalBody">
+            <form id="authForm" onsubmit="return false">
+                <div class="auth-field"><label for="authUsername">Username</label><input type="text" id="authUsername" class="auth-input" placeholder="Username" autocomplete="username" minlength="3" maxlength="50"></div>
+                <div class="auth-field"><label for="authEmail">Email</label><input type="email" id="authEmail" class="auth-input" placeholder="you@example.com" autocomplete="email"></div>
+                <div class="auth-field"><label for="authPassword">Password</label><input type="password" id="authPassword" class="auth-input" placeholder="At least 6 characters" autocomplete="current-password" minlength="6"></div>
+                <div class="auth-error" id="authError" style="display:none"></div>
+                <button type="submit" class="btn btn-primary auth-submit" id="authSubmitBtn">Sign In</button>
+            </form>
+            <p class="auth-switch"><span id="authSwitchText">Don't have an account?</span> <button class="auth-switch-btn" id="authSwitchBtn" onclick="toggleAuthMode()">Sign Up</button></p>
+        </div>
+    </div>
+</div>
+
+<div class="user-menu" id="userMenu" style="display:none">
+    <div class="user-menu-header"><span class="user-menu-name" id="userMenuName"></span><span class="user-menu-email" id="userMenuEmail"></span></div>
+    <button class="user-menu-item" onclick="handleLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+    <div class="bottom-nav-inner">
+        <button class="bottom-nav-item active" data-tab="home" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</button>
+        <button class="bottom-nav-item" data-tab="trending" onclick="switchTab('trending')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Trending</button>
+        <button class="bottom-nav-item" data-tab="seasonal" onclick="switchTab('seasonal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Seasonal</button>
+        <button class="bottom-nav-item" data-tab="schedule" onclick="switchTab('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Schedule</button>
+        <button class="bottom-nav-item" data-tab="search" onclick="switchTab('search')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
+    </div>
+</nav>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand-col">
+            <div class="footer-brand"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>AnimePulse</div>
+            <p class="footer-tagline">Your ultimate destination for high-quality streaming.</p>
+            <p class="footer-disclaimer">This site does not store any files on its server. All contents are provided by non-affiliated third parties.</p>
+        </div>
+        <div class="footer-links-col">
+            <h4>Navigation</h4>
+            <ul><li><a href="#" onclick="switchTab('home'); return false;">Home</a></li><li><a href="#" onclick="switchTab('trending'); return false;">Trending</a></li><li><a href="#" onclick="switchTab('seasonal'); return false;">Seasonal</a></li><li><a href="#" onclick="switchTab('schedule'); return false;">Schedule</a></li></ul>
+        </div>
+        <div class="footer-links-col">
+            <h4>Legal</h4>
+            <ul><li><a href="#">Terms of Service</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">DMCA</a></li></ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-copyright">&copy; 2026 AnimePulse. All rights reserved.</div>
+    </div>
+</footer>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18,15 12,9 6,15"/></svg></button>
+
+<script>
+(function(){
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.18/dist/hls.min.js';
+    s.onerror = function(){
+        var s2 = document.createElement('script');
+        s2.src = 'https://unpkg.com/hls.js@1.5.18/dist/hls.min.js';
+        document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+})();
+(function(){
+    var BASE;
+    if (window.API_BASE_OVERRIDE) BASE = window.API_BASE_OVERRIDE;
+    else if (window.location.hostname.includes('vercel.app')) BASE = window.location.origin + '/api';
+    else BASE = window.location.origin + '/api';
+    window.API_BASE = BASE;
+})();
+(function(){
+  var detected = false;
+  function kill() { if (detected) return; detected = true; location.reload(); }
+  (function(){
+    var nativeLog = console.log.bind(console);
+    function makeTrap() { if (detected) return; var el = document.createElement('div'); Object.defineProperty(el, 'id', { get: kill, configurable: false }); nativeLog(el); }
+    makeTrap(); setInterval(makeTrap, 500);
+  })();
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  setTimeout(function(){ ['log','warn','error','info','debug','trace'].forEach(function(m){ console[m] = function(){}; }); setInterval(function(){ console.clear(); }, 2000); }, 3000);
+})();
+</script>
+<script src="/app.js"></script>
+<div id="globalTooltip" class="global-tooltip" style="display:none"></div>
+</body>
+</html>

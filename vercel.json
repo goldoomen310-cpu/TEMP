@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "buildCommand": "node build.js",
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff2?|ttf|eot))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
