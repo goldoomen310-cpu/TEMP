@@ -1442,16 +1442,21 @@ async function startStreaming(id, lang = 'sub') {
         if (info) {
             const a = currentAnimeDetail;
             info.innerHTML = `
-                <h2 class="watch-title">${esc(a.title)}</h2>
-                <div class="watch-meta">
-                    ${clean(a.type)      ? `<span>${esc(clean(a.type))}</span>`      : ''}
-                    <span>${esc(normStatus(a.status))}</span>
-                    ${clean(a.score)     ? `<span>★ ${esc(clean(a.score))}</span>`   : ''}
-                    ${clean(a.premiered) ? `<span>${esc(clean(a.premiered))}</span>` : ''}
-                </div>
-                ${a.genres ? `<div class="watch-genres">${esc(a.genres)}</div>` : ''}
-                ${clean(a.studios) ? `<div class="watch-studios">${esc(clean(a.studios))}</div>` : ''}
-                <div class="watch-synopsis">${esc(a.overview||a.genres||'No synopsis available.')}</div>`;
+                <div class="watch-info-split">
+                    <img class="watch-info-poster" src="${esc(posterSrc(a.poster, a.title))}" alt="${esc(a.title)}" loading="lazy" onerror="this.style.display='none'">
+                    <div class="watch-info-content">
+                        <h2 class="watch-title">${esc(a.title)}</h2>
+                        <div class="watch-meta">
+                            ${clean(a.type)      ? `<span>${esc(clean(a.type))}</span>`      : ''}
+                            <span class="status-text">${esc(normStatus(a.status))}</span>
+                            ${clean(a.score)     ? `<span class="score-text">★ ${esc(clean(a.score))}</span>`   : ''}
+                            ${clean(a.premiered) ? `<span>${esc(clean(a.premiered))}</span>` : ''}
+                        </div>
+                        ${a.genres ? `<div class="watch-genres">${splitList(a.genres).map(g => `<span class="genre-tag-sm">${esc(g)}</span>`).join('')}</div>` : ''}
+                        ${clean(a.studios) ? `<div class="watch-studios"><strong>Studio:</strong> ${esc(clean(a.studios))}</div>` : ''}
+                        <div class="watch-synopsis">${esc(a.overview||a.genres||'No synopsis available.')}</div>
+                    </div>
+                </div>`;
         }
 
         // Render cast, next episode, studio from currentAnimeDetail

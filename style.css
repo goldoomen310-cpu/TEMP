@@ -1083,3 +1083,70 @@ body.focus-active { overflow:hidden !important; }
   .episodes-section-header { flex-wrap:wrap; gap:0.4rem; }
   .episodes-section-header .ep-filter-input { width:100%; }
 }
+
+/* --- Reorganized Watch Details --- */
+.watch-info-split {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+.watch-info-poster {
+  width: 140px;
+  border-radius: var(--r-md);
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.watch-info-content {
+  flex: 1;
+  min-width: 0;
+}
+.watch-meta {
+  display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;
+  font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;
+}
+.watch-meta .score-text { color: #f59e0b; font-weight: 600; }
+.watch-genres {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;
+}
+.genre-tag-sm {
+  background: rgba(255,255,255,0.06); padding: 0.15rem 0.5rem;
+  border-radius: 4px; font-size: 0.68rem; font-weight: 500; color: var(--text-sub);
+}
+
+/* --- Mobile Overrides (Make it compact and native-feeling) --- */
+@media (max-width: 480px) {
+  /* Make the spotlight edge-to-edge and shorter */
+  .spotlight {
+     height: 220px !important;
+     border-radius: 0 !important;
+     margin-left: -0.5rem !important;
+     margin-right: -0.5rem !important;
+     width: calc(100% + 1rem) !important;
+     max-width: none !important;
+     margin-bottom: 1.5rem !important;
+  }
+  .spotlight-slide { padding: 1.25rem 1rem !important; }
+  .spotlight-title { font-size: 1.25rem !important; }
+  .spotlight-meta { margin-bottom: 0.3rem !important; }
+  .spotlight-overview { display: none !important; }
+  .spotlight-dots { bottom: 0.75rem !important; right: 1rem !important; }
+  /* Shrink Anime Cards in Carousel */
+  .anime-carousel .anime-card {
+     min-width: 105px !important;
+     max-width: 105px !important;
+   }
+  .anime-card .anime-info { padding: 0.4rem 0.3rem 0.3rem !important; }
+  .anime-card .anime-title { font-size: 0.72rem !important; }
+  .card-ep-badge { font-size: 0.55rem !important; }
+
+  /* Shrink Section Headers */
+  .section-header { margin-bottom: 0.6rem !important; }
+  .section-title { font-size: 0.95rem !important; }
+  .content-section { margin-bottom: 1rem !important; }
+  /* Adjust new Watch Details for mobile */
+  .watch-info-split { gap: 0.85rem; }
+  .watch-info-poster { width: 95px; border-radius: var(--r-sm); }
+  .wp-info-card .watch-title { font-size: 1.1rem; margin-bottom: 0.2rem; }
+  .wp-info-card .watch-synopsis { font-size: 0.78rem; line-height: 1.5; }
+}
