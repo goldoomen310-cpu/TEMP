@@ -497,15 +497,30 @@
         <div class="anilist-modal-body">
             <div class="auth-field">
                 <label>Status</label>
-                <select id="alModalStatus" class="auth-input">
-                    <option value="AUTO">Auto (Default)</option>
-                    <option value="CURRENT">Watching</option>
-                    <option value="PLANNING">Plan to watch</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="REPEATING">Rewatching</option>
-                    <option value="PAUSED">Paused</option>
-                    <option value="DROPPED">Dropped</option>
-                </select>
+                <div class="custom-select-wrap">
+                    <div class="custom-select-trigger" id="alModalStatusTrigger" tabindex="0" role="combobox" aria-expanded="false">
+                        <span id="alModalStatusText">Auto (Default)</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" class="select-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <select id="alModalStatus" style="display:none">
+                        <option value="AUTO">Auto (Default)</option>
+                        <option value="CURRENT">Watching</option>
+                        <option value="PLANNING">Plan to watch</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="REPEATING">Rewatching</option>
+                        <option value="PAUSED">Paused</option>
+                        <option value="DROPPED">Dropped</option>
+                    </select>
+                    <div class="custom-select-options" id="alModalStatusOptions">
+                        <button type="button" data-value="AUTO">Auto (Default)</button>
+                        <button type="button" data-value="CURRENT">Watching</button>
+                        <button type="button" data-value="PLANNING">Plan to watch</button>
+                        <button type="button" data-value="COMPLETED">Completed</button>
+                        <button type="button" data-value="REPEATING">Rewatching</button>
+                        <button type="button" data-value="PAUSED">Paused</button>
+                        <button type="button" data-value="DROPPED">Dropped</button>
+                    </div>
+                </div>
             </div>
             <div class="auth-field">
                 <label>Score (0-5)</label>

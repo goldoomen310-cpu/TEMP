@@ -2793,6 +2793,12 @@ async function openAnilistModal(malId) {
     const entry = await checkAnilistEntry(malId);
 
     document.getElementById('alModalStatus').value = entry?.status || 'AUTO';
+    const statusText = document.getElementById('alModalStatusText');
+    if (statusText) {
+        const sel = document.getElementById('alModalStatus');
+        const opt = sel.options[sel.selectedIndex];
+        statusText.textContent = opt ? opt.textContent : 'Auto (Default)';
+    }
     document.getElementById('alModalScore').value = entry?.score ? (entry.score / 20) : '';
     document.getElementById('alModalProgress').value = entry?.progress || 0;
     document.getElementById('alModalRewatches').value = entry?.repeat || 0;
@@ -2939,3 +2945,39 @@ fetchAnilistWatchlist = async function() {
         initCarousel('anilistWatchingCarousel', mappedData, createContinueWatchingCard);
     } catch (e) { console.error('Failed to fetch AniList', e); }
 }
+
+// ─── Custom Dropdown Init ────────────────────────────────────────────────────
+(function() {
+    function initDropdown() {
+        const trigger = document.getElementById('alModalStatusTrigger');
+        const options = document.getElementById('alModalStatusOptions');
+        const select = document.getElementById('alModalStatus');
+        if (!trigger || !options || !select) { setTimeout(initDropdown, 50); return; }
+
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = options.classList.contains('open');
+            document.querySelectorAll('.custom-select-options.open').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.custom-select-trigger[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+            if (!isOpen) {
+                options.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        options.addEventListener('click', function(e) {
+            const btn = e.target.closest('button[data-value]');
+            if (!btn) return;
+            select.value = btn.dataset.value;
+            document.getElementById('alModalStatusText').textContent = btn.textContent;
+            options.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        });
+
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.custom-select-options.open').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.custom-select-trigger[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
+        });
+    }
+    initDropdown();
+})();
