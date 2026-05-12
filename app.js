@@ -2586,44 +2586,38 @@ function updateAnilistStatus() {
 
 async function fetchAnilistWatchlist() {
     const token = localStorage.getItem('anilist_token');
-    if (!token) return;
-    const query = `
-    query {
-      MediaListCollection(type: ANIME, status_in: [CURRENT, PLANNING, REPEATING]) {
-        lists {
-          entries {
-            progress
-            media {
-              id
-              idMal
-              title { romaji english }
-              coverImage { extraLarge }
-              status
-            }
-          }
-        }
-      }
-    }`;
+    if (!token || localStorage.getItem('anilist_show_row') === 'false') {
+        const sec = document.getElementById('anilistWatchingSection');
+        if (sec) sec.style.display = 'none';
+        return;
+    }
     try {
+        const viewerRes = await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: 'query { Viewer { id } }' })
+        });
+        const viewerJson = await viewerRes.json();
+        const userId = viewerJson.data?.Viewer?.id;
+        if (!userId) { console.error('[AniList] Could not fetch Viewer ID'); return; }
+
+        const query = `query ($userId: Int) {
+          MediaListCollection(userId: $userId, type: ANIME, status_in: [CURRENT, PLANNING, REPEATING]) {
+            lists { entries { progress media { id idMal title { romaji english } coverImage { extraLarge } status } } }
+          }
+        }`;
         const res = await fetch('https://graphql.anilist.co', {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ query })
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ query, variables: { userId } })
         });
         const json = await res.json();
-        console.log('[AniList] response:', json);
         if (json.errors) { console.error('[AniList] GraphQL errors:', json.errors); return; }
         const lists = json.data?.MediaListCollection?.lists || [];
         let entries = [];
-        lists.forEach(list => {
-            (list.entries || []).forEach(entry => entries.push(entry));
-        });
-        if (!entries.length) { console.log('[AniList] no entries found'); return; }
-        console.log('[AniList] entries:', entries.length);
+        lists.forEach(list => { (list.entries || []).forEach(entry => entries.push(entry)); });
+        if (!entries.length) { console.log('[AniList] No entries found.'); return; }
+
         document.getElementById('anilistWatchingSection').style.display = 'block';
         const container = document.getElementById('anilistWatchingCarousel');
         container.innerHTML = '';
@@ -2633,17 +2627,14 @@ async function fetchAnilistWatchlist() {
             const cardId = anime.idMal || `anilist:${anime.id}`;
             const progress = entry.progress || 0;
             const nextEp = progress + 1;
-            container.innerHTML += `
-                <div class="anime-card" onclick='resumeAnime(${JSON.stringify(String(cardId))}, 0, ${JSON.stringify(String(nextEp))})'>
-                    <div class="anime-poster">
-                        <img src="${esc(anime.coverImage.extraLarge)}" alt="${esc(title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22300%22><rect fill=%22%23131726%22 width=%22200%22 height=%22300%22/></svg>'">
-                        <div class="anime-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div>
-                        <div class="continue-badge">EP ${esc(String(nextEp))}</div>
-                    </div>
-                    <div class="anime-info">
-                        <div class="anime-title">${esc(title)}</div>
-                    </div>
-                </div>`;
+            container.innerHTML += `<div class="anime-card" onclick='resumeAnime(${JSON.stringify(String(cardId))}, 0, ${JSON.stringify(String(nextEp))})'>
+                <div class="anime-poster">
+                    <img src="${esc(anime.coverImage.extraLarge)}" alt="${esc(title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22300%22><rect fill=%22%23131726%22 width=%22200%22 height=%22300%22/></svg>'">
+                    <div class="anime-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div>
+                    <div class="continue-badge">EP ${esc(String(nextEp))}</div>
+                </div>
+                <div class="anime-info"><div class="anime-title">${esc(title)}</div></div>
+            </div>`;
         });
     } catch (e) {
         console.error('Failed to fetch AniList', e);
