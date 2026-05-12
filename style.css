@@ -880,6 +880,42 @@ body.focus-active { overflow:hidden !important; }
 .ep-modal-play { color:var(--primary); opacity:0.5; flex-shrink:0; }
 .ep-modal-item:hover .ep-modal-play { opacity:1; }
 
+/* ─── AniList Modal ──────────────── */
+.anilist-modal-body { padding:1.25rem 1.25rem 1.5rem; }
+.anilist-modal-body .auth-field { margin-bottom:1rem; }
+.anilist-modal-body .auth-field:last-of-type { margin-bottom:0; }
+.anilist-modal-body .auth-field label { display:block; font-size:0.72rem; font-weight:600; color:var(--text-sub); margin-bottom:0.3rem; text-transform:uppercase; letter-spacing:0.3px; }
+.anilist-modal-body .auth-field .inline-group { display:flex; gap:0.5rem; align-items:center; }
+.anilist-modal-body .auth-field .inline-group .auth-input { flex:1; }
+.anilist-modal-body .auth-field .inline-group .checkbox-label { display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:var(--text); white-space:nowrap; cursor:pointer; }
+.anilist-modal-body .auth-field .inline-group .checkbox-label input[type="checkbox"] { accent-color:var(--primary); }
+.anilist-modal-body .auth-field .date-group { display:flex; gap:0.75rem; }
+.anilist-modal-body .auth-field .date-group label { flex:1; }
+.anilist-modal-body .auth-field .date-group input { margin-top:0.3rem; }
+.anilist-modal-body .auth-field select.auth-input {
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:14px;
+  padding-right:2.5rem;
+  cursor:pointer;
+}
+.anilist-modal-body .anilist-modal-save {
+  width:100%; margin-top:1.25rem;
+  background:#3db4f2; color:#fff; font-weight:700;
+  padding:0.75rem 1.4rem; border-radius:var(--r-md);
+  border:none; font-size:0.95rem;
+  transition:all 0.2s; cursor:pointer;
+  font-family:var(--font);
+}
+.anilist-modal-body .anilist-modal-save:hover { background:#2a9cd6; transform:translateY(-1px); }
+.anilist-modal-body .anilist-modal-save:active { transform:translateY(0); }
+
+/* ─── AniList Action Button ──────── */
+.anilist-action-btn { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; }
+.anilist-action-btn svg { flex-shrink:0; }
+
 /* ─── Auth Modal ──────────────────── */
 .auth-modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.85);

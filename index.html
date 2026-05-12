@@ -60,7 +60,7 @@
                             Watch Anime from your list!
                         </h2>
                     </div>
-                    <div class="anime-grid" id="anilistWatchingCarousel"></div>
+                    <div class="anime-carousel" id="anilistWatchingCarousel"></div>
                 </div>
                 <div class="content-section">
                     <div class="section-header"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Trending Now</h2></div>
@@ -488,6 +488,53 @@
 })();
 </script>
 <script src="/app.js"></script>
+<div class="modal-overlay" id="anilistModal" onclick="if(event.target===this)closeAnilistModal()">
+    <div class="ep-modal-content" style="max-width:450px">
+        <div class="ep-modal-header">
+            <h3>AniList</h3>
+            <button class="ep-modal-close" onclick="closeAnilistModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div class="anilist-modal-body">
+            <div class="auth-field">
+                <label>Status</label>
+                <select id="alModalStatus" class="auth-input">
+                    <option value="AUTO">Auto (Default)</option>
+                    <option value="CURRENT">Watching</option>
+                    <option value="PLANNING">Plan to watch</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="REPEATING">Rewatching</option>
+                    <option value="PAUSED">Paused</option>
+                    <option value="DROPPED">Dropped</option>
+                </select>
+            </div>
+            <div class="auth-field">
+                <label>Score (0-5)</label>
+                <input type="number" id="alModalScore" class="auth-input" min="0" max="5" step="0.5" placeholder="e.g. 4.5">
+            </div>
+            <div class="auth-field">
+                <label>Episode Progress</label>
+                <div class="inline-group">
+                    <input type="number" id="alModalProgress" class="auth-input" min="0" placeholder="0">
+                    <label class="checkbox-label"><input type="checkbox" id="alModalProgAuto" checked> Auto</label>
+                </div>
+            </div>
+            <div class="auth-field">
+                <label>Total Rewatches</label>
+                <div class="inline-group">
+                    <input type="number" id="alModalRewatches" class="auth-input" min="0" placeholder="0">
+                    <label class="checkbox-label"><input type="checkbox" id="alModalRewatchAuto" checked> Auto</label>
+                </div>
+            </div>
+            <div class="auth-field">
+                <div class="date-group">
+                    <label>Start Date <input type="date" id="alModalStart" class="auth-input"></label>
+                    <label>Finish Date <input type="date" id="alModalFinish" class="auth-input"></label>
+                </div>
+            </div>
+            <button class="anilist-modal-save" onclick="saveAnilistModal()">Save to AniList</button>
+        </div>
+    </div>
+</div>
 <div id="globalTooltip" class="global-tooltip" style="display:none"></div>
 </body>
 </html>
