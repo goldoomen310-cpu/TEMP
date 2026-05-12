@@ -1234,11 +1234,10 @@ body {
 }
 
 /* =========================================
-   FIX: Remove annoying white bounce effect
+   FIX: Remove annoying white bounce effect (Without breaking scroll!)
    ========================================= */
 html, body {
   background-color: var(--bg) !important;
-  overscroll-behavior-y: none !important;
 }
 
 /* =========================================
