@@ -1947,6 +1947,38 @@ async function handleAnilistSchedule(reqUrl, res) {
     } catch (err) { sendJson(res, 200, { results: [], grouped: {} }); }
 }
 
+// ─── AniList OAuth ───────────────────────────────────────────────────────────────
+const ANILIST_CLIENT_SECRET = 'uAo2OqSuWSkBWfzQnmW4OLHXehjbrzxMTmcnpKtv';
+
+async function handleAnilistExchange(req, res) {
+    try {
+        const body = JSON.parse(await readBody(req));
+        const { code, redirect_uri } = body || {};
+        if (!code) return sendJson(res, 400, { error: 'Missing authorization code.' });
+
+        const r = await fetch('https://anilist.co/api/v2/oauth/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                grant_type: 'authorization_code',
+                client_id: '41261',
+                client_secret: ANILIST_CLIENT_SECRET,
+                redirect_uri,
+                code
+            })
+        });
+        const data = await r.json();
+        if (r.ok) {
+            sendJson(res, 200, { success: true, access_token: data.access_token });
+        } else {
+            sendJson(res, 400, { success: false, error: data });
+        }
+    } catch (err) {
+        console.error('AniList Exchange Error:', err);
+        sendJson(res, 500, { success: false, error: 'Internal Server Error' });
+    }
+}
+
 // ─── Auth handlers ────────────────────────────────────────────────────────────
 
 async function handleRegister(req, reqUrl, res) {
@@ -2060,6 +2092,24 @@ function handleLogout(req, reqUrl, res) {
     const cors = corsForOrigin(req);
     clearCookie(res, COOKIE_NAME);
     sendJson(res, 200, { message: 'Logged out.' }, cors);
+}
+
+async function handleDeleteUser(req, res) {
+    const cors = corsForOrigin(req);
+    const authUser = getAuthUser(req);
+    if (!authUser) return sendJson(res, 401, { error: 'Not logged in.' }, cors);
+    if (!supabase) return sendJson(res, 500, { error: 'Database not configured.' }, cors);
+    try {
+        await supabase.from('episode_comments').delete().eq('user_id', authUser.userId);
+        await supabase.from('comment_likes').delete().eq('user_id', authUser.userId);
+        await supabase.from('watch_progress').delete().eq('user_id', authUser.userId);
+        await supabase.from('users').delete().eq('id', authUser.userId);
+        clearCookie(res, COOKIE_NAME);
+        sendJson(res, 200, { message: 'Account deleted.' }, cors);
+    } catch (err) {
+        console.error('Delete user error:', err);
+        sendJson(res, 500, { error: 'Failed to delete account.' }, cors);
+    }
 }
 
 async function handleMe(req, reqUrl, res) {
@@ -2179,11 +2229,20 @@ async function handleGetComments(req, reqUrl, res) {
     }
 }
 
+const _commentRateMap = new Map();
+
 async function handlePostComment(req, reqUrl, res) {
     const cors = corsForOrigin(req);
     const authUser = getAuthUser(req);
     if (!authUser) {
         return sendJson(res, 401, { error: 'You must be logged in to comment.' }, cors);
+    }
+
+    // Rate limit: 1 comment per 10 seconds per user
+    const now = Date.now();
+    const last = _commentRateMap.get(authUser.userId) || 0;
+    if (now - last < 10000) {
+        return sendJson(res, 429, { error: 'You are posting too fast. Please wait a few seconds.' }, cors);
     }
 
     const match = reqUrl.pathname.match(/^\/api\/anime\/([^/]+)\/episodes\/([^/]+)\/comments$/);
@@ -2225,6 +2284,8 @@ async function handlePostComment(req, reqUrl, res) {
             console.error('Post comment error:', insertErr);
             return sendJson(res, 500, { error: 'Failed to post comment.' }, cors);
         }
+
+        _commentRateMap.set(authUser.userId, Date.now());
 
         sendJson(res, 201, {
             comment: {
@@ -2495,6 +2556,10 @@ const server = http.createServer(async (req, res) => {
     if (reqUrl.pathname === '/api/anilist/popular-alltime') return handleAnilistPopularAlltime(reqUrl, res);
     if (reqUrl.pathname === '/api/anilist/enrich')          return handleAnilistEnrich(reqUrl, res);
     if (reqUrl.pathname === '/api/anilist/schedule')        return handleAnilistSchedule(reqUrl, res);
+    if (reqUrl.pathname === '/api/anilist-exchange') {
+        if (req.method !== 'POST') return send(res, 405, 'Method Not Allowed');
+        return handleAnilistExchange(req, res);
+    }
 
     if (reqUrl.pathname === '/api/media')               return handleMedia(req, reqUrl, res);
     if (reqUrl.pathname.startsWith('/api/image/'))      return handleImageProxy(req, reqUrl, res);
@@ -2515,6 +2580,10 @@ const server = http.createServer(async (req, res) => {
     if (reqUrl.pathname === '/api/auth/me') {
         if (req.method !== 'GET') return send(res, 405, 'Method Not Allowed');
         return handleMe(req, reqUrl, res);
+    }
+    if (reqUrl.pathname === '/api/user') {
+        if (req.method !== 'DELETE') return send(res, 405, 'Method Not Allowed');
+        return handleDeleteUser(req, res);
     }
 
     // Watch progress routes

@@ -8,7 +8,13 @@ const API_BASE = window.API_BASE || '/api';
 
 // ─── Popunder ─────────────────────────────────────────────────────────────────
 const AD_URL = 'https://sorrowfulpsychology.com/bU3IV/0.Pm3sphv/bKmiVLJ/ZKD/0u3/MeDWMe5BMaDLAj5dLoTSc_wdMMzYk/wGMeTdMo';
-document.addEventListener('click', () => window.open(AD_URL, '_blank'));
+let _lastPop = 0;
+document.addEventListener('click', () => {
+    const now = Date.now();
+    if (now - _lastPop < 15000) return;
+    _lastPop = now;
+    window.open(AD_URL, '_blank');
+});
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let currentUser            = null;
@@ -138,7 +144,6 @@ function updateAuthUI() {
         if (userMenu) {
             if (nameEl) nameEl.textContent = currentUser.username;
             if (emailEl) emailEl.textContent = currentUser.email || '';
-            userMenu.style.display = 'block';
         }
     } else {
         if (label) label.textContent = 'Sign In';
@@ -538,7 +543,7 @@ function switchTab(tabId, updateRoute = true) {
     if (currentTab === 'watch' && tabId !== 'watch') { destroyHls(); if (activeVideo) { activeVideo.pause(); activeVideo = null; } }
     document.getElementById('navbar')?.classList.remove('nav-open');
     currentTab = tabId;
-    const routes = { home:'/home', trending:'/trending', seasonal:'/seasonal', schedule:'/schedule', search:'/search', tos:'/tos', privacy:'/privacy' };
+    const routes = { home:'/home', trending:'/trending', seasonal:'/seasonal', schedule:'/schedule', search:'/search', settings:'/settings', tos:'/tos', privacy:'/privacy' };
     if (updateRoute) setRoute(routes[tabId] || '/home');
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.tab === tabId));
     document.querySelectorAll('.bottom-nav-item').forEach(l => l.classList.toggle('active', l.dataset.tab === tabId));
@@ -552,6 +557,7 @@ function loadTabData(tabId) {
     else if (tabId === 'search')   { currentSearchPage = 1; fetchSearchGridV2(); }
     else if (tabId === 'seasonal') fetchSeasonalGrid();
     else if (tabId === 'schedule') fetchScheduleGrid();
+    else if (tabId === 'settings') loadSettingsPage();
 }
 
 // ─── Home (only Anilist discover sections, no old data sources) ─────────────
@@ -656,6 +662,7 @@ async function renderContinueWatching() {
     const section = document.getElementById('continueWatchingSection');
     const carousel = document.getElementById('continueWatchingCarousel');
     if (!section || !carousel) return;
+    if (localStorage.getItem('anilist_token')) fetchAnilistWatchlist();
     let items;
     if (currentUser) {
         try {
@@ -2357,6 +2364,7 @@ function loadRoute() {
 
     if (/^\/trending/i.test(p))  return switchTab('trending', false);
     if (/^\/seasonal/i.test(p))  return switchTab('seasonal', false);
+    if (/^\/settings/i.test(p))  return switchTab('settings', false);
     if (/^\/schedule/i.test(p))  return switchTab('schedule', false);
     if (/^\/search/i.test(p))    return switchTab('search',   false);
     if (/^\/tos/i.test(p))       return switchTab('tos',      false);
@@ -2370,6 +2378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRoute();
     checkAuth();
     initSidebarGenres();
+    updateAnilistStatus();
     // Auth button — toggle user menu on click when logged in
     document.getElementById('authBtn')?.addEventListener('click', e => {
         if (currentUser) {
@@ -2482,4 +2491,145 @@ document.addEventListener('DOMContentLoaded', () => {
 function hideTooltip() {
     const tip = document.getElementById('globalTooltip');
     if (tip) tip.style.display = 'none';
+}
+
+// ─── SETTINGS UI ─────────────────────────────────────────────────────────────
+function switchSettingsTab(tabId, btn) {
+    document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.settings-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tabId === 'profile' ? 'settingsProfile' : 'settingsAnilist').classList.add('active');
+}
+
+function loadSettingsPage() {
+    if (!currentUser) {
+        document.getElementById('settingsProfile').innerHTML = '<div class="settings-card"><p style="text-align:center;color:var(--text-sub)">Sign in to view your profile.</p></div>';
+        return;
+    }
+    document.getElementById('profUsername').textContent = currentUser.username || 'User';
+    document.getElementById('profEmail').textContent = currentUser.email || '';
+    updateAnilistStatus();
+}
+
+async function deleteAccount() {
+    if (!confirm('Are you 100% sure you want to delete your account? This cannot be undone.')) return;
+    try {
+        await authFetch(`${API_BASE}/user`, { method: 'DELETE' });
+        handleLogout();
+    } catch (err) {
+        alert('Failed to delete account: ' + err.message);
+    }
+}
+
+// ─── ANILIST OAUTH & GRAPHQL ──────────────────────────────────────────────────
+const ANILIST_CLIENT_ID = '41261';
+const REDIRECT_URI = window.location.origin + '/';
+
+function initiateAnilistAuth() {
+    window.location.href = `https://anilist.co/api/v2/oauth/authorize?client_id=${ANILIST_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+}
+
+(function handleAnilistRedirect() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (!code) return;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    fetch(`${API_BASE}/anilist-exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirect_uri: REDIRECT_URI })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.access_token) {
+            localStorage.setItem('anilist_token', data.access_token);
+            updateAnilistStatus();
+            switchTab('home');
+            fetchAnilistWatchlist();
+        }
+    })
+    .catch(console.error)
+    .finally(() => document.getElementById('loadingOverlay').style.display = 'none');
+})();
+
+function updateAnilistStatus() {
+    const token = localStorage.getItem('anilist_token');
+    const btn = document.getElementById('anilistAuthBtn');
+    const status = document.getElementById('anilistStatusText');
+    if (token) {
+        btn.textContent = 'AniList Connected';
+        btn.disabled = true;
+        if (status) status.textContent = 'Your AniList account is linked.';
+    } else {
+        btn.textContent = 'Authorize AniList';
+        btn.disabled = false;
+        if (status) status.textContent = '';
+    }
+}
+
+async function fetchAnilistWatchlist() {
+    const token = localStorage.getItem('anilist_token');
+    if (!token) return;
+    const query = `
+    query {
+      MediaListCollection(type: ANIME, status_in: [CURRENT, PLANNING, REPEATING]) {
+        lists {
+          entries {
+            progress
+            media {
+              id
+              idMal
+              title { romaji english }
+              coverImage { extraLarge }
+              status
+            }
+          }
+        }
+      }
+    }`;
+    try {
+        const res = await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ query })
+        });
+        const json = await res.json();
+        console.log('[AniList] response:', json);
+        if (json.errors) { console.error('[AniList] GraphQL errors:', json.errors); return; }
+        const lists = json.data?.MediaListCollection?.lists || [];
+        let entries = [];
+        lists.forEach(list => {
+            (list.entries || []).forEach(entry => entries.push(entry));
+        });
+        if (!entries.length) { console.log('[AniList] no entries found'); return; }
+        console.log('[AniList] entries:', entries.length);
+        document.getElementById('anilistWatchingSection').style.display = 'block';
+        const container = document.getElementById('anilistWatchingCarousel');
+        container.innerHTML = '';
+        entries.forEach(entry => {
+            const anime = entry.media;
+            const title = anime.title.english || anime.title.romaji;
+            const cardId = anime.idMal || `anilist:${anime.id}`;
+            const progress = entry.progress || 0;
+            const nextEp = progress + 1;
+            container.innerHTML += `
+                <div class="anime-card" onclick='resumeAnime(${JSON.stringify(String(cardId))}, 0, ${JSON.stringify(String(nextEp))})'>
+                    <div class="anime-poster">
+                        <img src="${esc(anime.coverImage.extraLarge)}" alt="${esc(title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22300%22><rect fill=%22%23131726%22 width=%22200%22 height=%22300%22/></svg>'">
+                        <div class="anime-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div>
+                        <div class="continue-badge">EP ${esc(String(nextEp))}</div>
+                    </div>
+                    <div class="anime-info">
+                        <div class="anime-title">${esc(title)}</div>
+                    </div>
+                </div>`;
+        });
+    } catch (e) {
+        console.error('Failed to fetch AniList', e);
+    }
 }
