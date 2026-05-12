@@ -695,7 +695,7 @@ img { display:block; }
 .watch-studios { margin-top:0.5rem; font-size:0.74rem; color:var(--text-muted); }
 .watch-studios strong { color:var(--text-sub); }
 
-.skip-segment-btn { position:absolute; right:1.25rem; bottom:4rem; z-index:15; display:none; padding:0.5rem 1rem; border:1px solid rgba(251,191,36,0.35); border-radius:var(--r-sm); background:rgba(10,10,15,0.9); backdrop-filter:blur(8px); color:#fde68a; font-weight:700; font-size:0.78rem; transition:var(--transition); }
+.skip-segment-btn { position:absolute; top:1rem; right:1.25rem; z-index:25; display:none; padding:0.5rem 1rem; border:1px solid rgba(251,191,36,0.35); border-radius:var(--r-sm); background:rgba(10,10,15,0.9); backdrop-filter:blur(8px); color:#fde68a; font-weight:700; font-size:0.78rem; transition:var(--transition); pointer-events:auto; }
 .skip-segment-btn:hover { background:rgba(251,191,36,0.12); border-color:#fcd34d; }
 .skip-segment-btn.active { display:block; animation:slideUp 0.2s ease forwards; }
 @keyframes slideUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
@@ -750,8 +750,7 @@ body.focus-active { overflow:hidden !important; }
 .ctrl-btn svg { width:18px; height:18px; }
 .ctrl-btn.play-btn svg { width:26px; height:26px; }
 .video-controls .time-label { color:rgba(255,255,255,0.75); font-size:0.74rem; font-weight:500; margin-left:0.3rem; white-space:nowrap; }
-.video-controls #skipSegmentBtn { padding:0.35rem 0.75rem; border:1px solid rgba(251,191,36,0.3); border-radius:var(--r-sm); background:rgba(10,10,15,0.9); color:#fde68a; font-weight:700; font-size:0.65rem; white-space:nowrap; min-width:70px; }
-.video-controls #skipSegmentBtn:hover { background:rgba(251,191,36,0.1); }
+
 
 .player-center-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.7); z-index:8; opacity:0; transition:opacity 0.12s ease,transform 0.12s ease; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; }
 .player-center-icon.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
@@ -1396,3 +1395,42 @@ html, body {
   transform: translateX(6px);
   box-shadow: -4px 0 0 var(--primary);
 }
+
+/* =========================================
+   1. KILL THE UGLY WHITE LINE
+   ========================================= */
+.detail-header, .wp-cinema, .nav-links { border-bottom: none !important; }
+.wp-cinema { border: none !important; }
+
+/* =========================================
+   2. REPOSITION THE COUNTDOWN
+   ========================================= */
+.watch-info-content .next-ep-countdown-inline {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--r-md);
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* =========================================
+   3. BIGGER PLAYER UI
+   ========================================= */
+.video-controls { padding: 3.5rem 1.5rem 1rem !important; }
+.ctrl-btn { width: 44px !important; height: 44px !important; }
+.ctrl-btn svg { width: 24px !important; height: 24px !important; }
+.ctrl-btn.play-btn svg { width: 32px !important; height: 32px !important; }
+.video-controls .time-label { font-size: 0.9rem !important; font-weight: 600 !important; }
+.video-controls .progress-wrap { height: 6px !important; margin-bottom: 1rem !important; }
+.video-controls .progress-wrap:hover { height: 10px !important; }
+.next-ep-countdown-player { margin-left:0.75rem; color:#a5b4fc; font-size:0.75rem; font-weight:600; white-space:nowrap; }
+
+/* =========================================
+   Turnstile widget in auth modal
+   ========================================= */
+.auth-modal-body .cf-turnstile { margin:0.75rem 0; display:flex; justify-content:center; }
+.auth-modal-body .cf-turnstile iframe { max-width:100%; }

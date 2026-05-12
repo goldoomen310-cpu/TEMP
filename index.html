@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://challenges.cloudflare.com">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <link rel="stylesheet" href="/style.css">
     <meta name="7b1f191d269920a0a02d7f195acb25fa6b45c7b2" content="7b1f191d269920a0a02d7f195acb25fa6b45c7b2" />
 </head>
@@ -311,7 +313,8 @@
                 <div class="auth-field"><label for="authEmail">Email</label><input type="email" id="authEmail" class="auth-input" placeholder="you@example.com" autocomplete="email"></div>
                 <div class="auth-field"><label for="authPassword">Password</label><input type="password" id="authPassword" class="auth-input" placeholder="At least 6 characters" autocomplete="current-password" minlength="6"></div>
                 <div class="auth-error" id="authError" style="display:none"></div>
-                <button type="submit" class="btn btn-primary auth-submit" id="authSubmitBtn">Sign In</button>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAADOB7Zg-y4EiIRYC" data-theme="dark" data-size="flexible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError" data-expired-callback="onTurnstileExpired"></div>
+                <button type="submit" class="btn btn-primary auth-submit" id="authSubmitBtn" disabled>Sign In</button>
             </form>
             <p class="auth-switch"><span id="authSwitchText">Don't have an account?</span> <button class="auth-switch-btn" id="authSwitchBtn" onclick="toggleAuthMode()">Sign Up</button></p>
         </div>

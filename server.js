@@ -16,6 +16,24 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '0.0.0.0';
 const ROOT = __dirname;
 
+// ─── Turnstile ────────────────────────────────────────────────────────────────
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || '0x4AAAAAADOB7XvpBg5Jtk3ZALKeGTn5Z9U';
+
+async function verifyTurnstile(token) {
+    if (!token) return false;
+    try {
+        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret: TURNSTILE_SECRET, response: token })
+        });
+        const data = await res.json();
+        return data.success === true;
+    } catch {
+        return false;
+    }
+}
+
 // ─── Supabase ────────────────────────────────────────────────────────────────
 const SUPABASE_URL        = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -1954,6 +1972,11 @@ async function handleRegister(req, reqUrl, res) {
             return sendJson(res, 400, { error: 'Password must be at least 6 characters.' }, cors);
         }
 
+        // Verify Turnstile
+        if (!await verifyTurnstile(body.turnstile_token)) {
+            return sendJson(res, 400, { error: 'CAPTCHA verification failed. Please try again.' }, cors);
+        }
+
         if (!supabase) {
             return sendJson(res, 500, { error: 'Database not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.' }, cors);
         }
@@ -1998,6 +2021,11 @@ async function handleLogin(req, reqUrl, res) {
 
         if (!email || !password) {
             return sendJson(res, 400, { error: 'Email and password are required.' }, cors);
+        }
+
+        // Verify Turnstile
+        if (!await verifyTurnstile(body.turnstile_token)) {
+            return sendJson(res, 400, { error: 'CAPTCHA verification failed. Please try again.' }, cors);
         }
 
         if (!supabase) {
@@ -2226,7 +2254,7 @@ async function handleGetWatchProgress(req, res) {
     try {
         const { data, error } = await supabase
             .from('watch_progress')
-            .select('anime_id, mal_id, title, poster, episode_number, updated_at')
+            .select('anime_id, mal_id, title, poster, episode_number, current_time, updated_at')
             .eq('user_id', authUser.userId)
             .order('updated_at', { ascending: false })
             .limit(20);
@@ -2243,7 +2271,7 @@ async function handleSaveWatchProgress(req, res) {
 
     try {
         const body = JSON.parse(await readBody(req));
-        const { anime_id, mal_id, title, poster, episode_number } = body || {};
+        const { anime_id, mal_id, title, poster, episode_number, current_time } = body || {};
         if (!anime_id || !title || !episode_number) {
             return sendJson(res, 400, { error: 'Missing required fields.' }, cors);
         }
@@ -2255,6 +2283,7 @@ async function handleSaveWatchProgress(req, res) {
             title,
             poster: poster || null,
             episode_number: String(episode_number),
+            current_time: current_time != null ? Number(current_time) : 0,
             updated_at: new Date().toISOString()
         }, { onConflict: 'user_id,anime_id' });
 

@@ -6,18 +6,9 @@
 // ─── Constants ────────────────────────────────────────────────────────────────
 const API_BASE = window.API_BASE || '/api';
 
-// ─── Popunder ad config (random, max 2 per minute) ────────────────────────────
-const AD_URL = 'https://work.ink/direct/3334';
-let _adTimestamps = [];
-document.addEventListener('click', function(){
-  const now = Date.now();
-  _adTimestamps = _adTimestamps.filter(t => now - t < 60000);
-  if (_adTimestamps.length >= 2) return;
-  if (Math.random() < 0.08) {
-    _adTimestamps.push(now);
-    window.open(AD_URL, '_blank');
-  }
-});
+// ─── Popunder ─────────────────────────────────────────────────────────────────
+const AD_URL = 'https://sorrowfulpsychology.com/bU3IV/0.Pm3sphv/bKmiVLJ/ZKD/0u3/MeDWMe5BMaDLAj5dLoTSc_wdMMzYk/wGMeTdMo';
+document.addEventListener('click', () => window.open(AD_URL, '_blank'));
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let currentUser            = null;
@@ -41,6 +32,7 @@ let lastDetailPageId      = null;
 let currentEnrichData     = null;
 let currentAnimepulseId   = null;
 let pendingSeekTime       = -1;
+let countdownTimer        = null;
 
 const defaultPlayerSettings = { autoSkip: true, autoNext: true, autoPlay: true };
 let playerSettings = (() => {
@@ -169,6 +161,21 @@ async function checkAuth() {
     if (!p || p === '/' || p.startsWith('/home')) renderContinueWatching();
 }
 
+let _turnstileToken = '';
+
+function onTurnstileSuccess(token) { _turnstileToken = token; document.getElementById('authSubmitBtn').disabled = false; }
+function onTurnstileError()        { _turnstileToken = '';  document.getElementById('authSubmitBtn').disabled = true; }
+function onTurnstileExpired()      { _turnstileToken = '';  document.getElementById('authSubmitBtn').disabled = true; }
+
+function resetTurnstile() {
+    _turnstileToken = '';
+    document.getElementById('authSubmitBtn').disabled = true;
+    if (typeof turnstile !== 'undefined') {
+        const container = document.querySelector('.cf-turnstile');
+        if (container) turnstile.reset(container);
+    }
+}
+
 let authMode = 'login';
 function openAuthModal() {
     if (currentUser) return;
@@ -176,15 +183,18 @@ function openAuthModal() {
     document.getElementById('authModal')?.classList.add('active');
     document.body.style.overflow = 'hidden';
     updateAuthForm();
+    setTimeout(resetTurnstile, 100);
 }
 function closeAuthModal() {
     document.getElementById('authModal')?.classList.remove('active');
     document.getElementById('authError').style.display = 'none';
     document.body.style.overflow = '';
+    resetTurnstile();
 }
 function toggleAuthMode() {
     authMode = authMode === 'login' ? 'register' : 'login';
     updateAuthForm();
+    setTimeout(resetTurnstile, 100);
 }
 function updateAuthForm() {
     const title = document.getElementById('authModalTitle');
@@ -231,18 +241,21 @@ async function handleRegister() {
         error.style.display = 'block';
         return;
     }
+    if (!_turnstileToken) { error.textContent = 'Please complete the CAPTCHA.'; error.style.display = 'block'; return; }
     try {
         const data = await authFetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
+            body: JSON.stringify({ username, email, password, turnstile_token: _turnstileToken })
         });
         currentUser = data.user;
         updateAuthUI();
         closeAuthModal();
+        renderContinueWatching();
     } catch (err) {
         error.textContent = err.message;
         error.style.display = 'block';
+        resetTurnstile();
     }
 }
 async function handleLogin() {
@@ -255,18 +268,21 @@ async function handleLogin() {
         error.style.display = 'block';
         return;
     }
+    if (!_turnstileToken) { error.textContent = 'Please complete the CAPTCHA.'; error.style.display = 'block'; return; }
     try {
         const data = await authFetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, turnstile_token: _turnstileToken })
         });
         currentUser = data.user;
         updateAuthUI();
         closeAuthModal();
+        renderContinueWatching();
     } catch (err) {
         error.textContent = err.message;
         error.style.display = 'block';
+        resetTurnstile();
     }
 }
 async function handleLogout() {
@@ -595,8 +611,8 @@ async function fetchHomeData() {
 // ─── Continue Watching ─────────────────────────────────────────────────────────
 const CW_KEY = 'animepulse_watch_progress';
 
-function saveWatchProgress(animeId, epNumber, title, poster, malId) {
-    const entry = { anime_id: animeId, mal_id: malId || '', title, poster: poster || '', episode_number: String(epNumber), updated_at: Date.now() };
+function saveWatchProgress(animeId, epNumber, title, poster, malId, currentTime) {
+    const entry = { anime_id: animeId, mal_id: malId || '', title, poster: poster || '', episode_number: String(epNumber), current_time: currentTime || 0, updated_at: Date.now() };
     // Always save to localStorage for guests
     try {
         let list = JSON.parse(localStorage.getItem(CW_KEY) || '[]');
@@ -614,6 +630,22 @@ function saveWatchProgress(animeId, epNumber, title, poster, malId) {
             body: JSON.stringify(entry)
         }).catch(() => {});
     }
+}
+
+function saveCurrentProgress() {
+    const video = document.getElementById('animeVideo');
+    if (!video || !video.duration || !currentAnimeDetail) return;
+    const detail = currentAnimeDetail;
+    const ep = currentEpisodes[currentEpisodeIndex];
+    if (!ep) return;
+    saveWatchProgress(
+        stripSourcePrefix(currentAnimeId || detail.id),
+        ep.number,
+        displayTitle(detail),
+        posterSrc(detail.poster, displayTitle(detail)),
+        detail.malId,
+        Math.floor(video.currentTime)
+    );
 }
 
 function getLocalWatchProgress() {
@@ -699,6 +731,15 @@ function formatCountdown(totalSeconds) {
     const s = Math.floor(totalSeconds % 60);
     const pad = (num) => num.toString().padStart(2, '0');
     return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+function formatShortCountdown(totalSeconds) {
+    if (totalSeconds <= 0) return 'Airing now';
+    const d = Math.floor(totalSeconds / (3600 * 24));
+    const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return `${d}d ${h}h ${m}m ${s}s`;
 }
 
 // ─── Carousel pagination (6 per page) ────────────────────────────────────────
@@ -800,7 +841,9 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
 
 function createContinueWatchingCard(p) {
     const cardId = p.anime_id || p.id;
-    return `<div class="anime-card" onclick='viewAnimeDetails(${JSON.stringify(String(cardId))})'>
+    const seekTime = p.current_time ? Math.floor(p.current_time) : 0;
+    const epNum = String(p.episode_number || 1);
+    return `<div class="anime-card" onclick='resumeAnime(${JSON.stringify(String(cardId))}, ${seekTime}, ${JSON.stringify(epNum)})'>
         <div class="anime-poster">
             <img src="${esc(p.poster)}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22300%22><rect fill=%22%23131726%22 width=%22200%22 height=%22300%22/></svg>'">
             <div class="anime-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="8,5 19,12 8,19"/></svg></div>
@@ -810,6 +853,15 @@ function createContinueWatchingCard(p) {
             <div class="anime-title">${esc(p.title)}</div>
         </div>
     </div>`;
+}
+
+function resumeAnime(id, seekTime, epNum) {
+    if (seekTime > 0) pendingSeekTime = seekTime;
+    const cleanId = stripSourcePrefix(id);
+    storeIdMapping(cleanId, String(id));
+    const path = `/watch/${encodeURIComponent(cleanId)}/ep-${encodeURIComponent(epNum)}`;
+    setRoute(path);
+    loadRoute();
 }
 
 // ─── Sidebar helpers ───────────────────────────────────────────────────────────
@@ -1426,7 +1478,7 @@ async function fetchAnilistEnrich(title) {
 }
 
 // ─── Streaming ────────────────────────────────────────────────────────────────
-async function startStreaming(id, lang = 'sub') {
+async function startStreaming(id, lang = 'sub', autoEp) {
     currentAnimeId      = id;
     currentMalId        = null;
     currentLang         = lang;
@@ -1467,6 +1519,7 @@ async function startStreaming(id, lang = 'sub') {
                     <img class="watch-info-poster" src="${esc(posterSrc(a.poster, a.title))}" alt="${esc(a.title)}" loading="lazy" onerror="this.style.display='none'">
                     <div class="watch-info-content">
                         <h2 class="watch-title">${esc(a.title)}</h2>
+                        ${a.nextAiringEpisode ? `<div class="next-ep-countdown-inline">Next Episode in: ${formatCountdown(a.nextAiringEpisode.timeUntilAiring)}</div>` : ''}
                         <div class="watch-meta">
                             ${clean(a.type)      ? `<span>${esc(clean(a.type))}</span>`      : ''}
                             <span class="status-text">${esc(normStatus(a.status))}</span>
@@ -1565,7 +1618,12 @@ async function startStreaming(id, lang = 'sub') {
         renderServerStrip();
         renderEpisodeList();
         fetchMoreLikeThis(currentAnimeDetail.genres, currentAnimeDetail.premiered);
-        playEpisode(0, document.querySelector('.episode-item'));
+        if (autoEp) {
+            const idx = currentEpisodes.findIndex(e => String(e.number) === String(autoEp));
+            playEpisode(idx >= 0 ? idx : 0, document.querySelector('.episode-item'));
+        } else {
+            playEpisode(0, document.querySelector('.episode-item'));
+        }
     } catch (e) {
         console.error(e);
         showPlayerUnavailable(null, 'Failed to load episode list.');
@@ -1803,6 +1861,21 @@ async function renderStream(stream) {
     const video  = document.getElementById('animeVideo');
     activeVideo  = video;
 
+    // Start countdown ticker for next episode airing
+    clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+        const el = document.getElementById('nextEpCountdownPlayer');
+        if (!el) return;
+        const ne = currentAnimeDetail?.nextAiringEpisode;
+        if (ne && ne.timeUntilAiring > 0) {
+            ne.timeUntilAiring--;
+            el.textContent = `Next: ${formatShortCountdown(ne.timeUntilAiring)}`;
+            el.style.display = '';
+        } else if (el) {
+            el.style.display = 'none';
+        }
+    }, 1000);
+
     function showLoading(show) {
         const el = document.getElementById('playerLoading');
         if (el) el.classList.toggle('visible', show);
@@ -1811,7 +1884,16 @@ async function renderStream(stream) {
     if (isM3U8) {
         await waitForHls();
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-            const hls = new Hls({ maxBufferLength: 30, enableWorker: false });
+            const hls = new Hls({
+                maxBufferLength: 60,
+                maxMaxBufferLength: 600,
+                backBufferLength: 30,
+                enableWorker: true,
+                lowLatencyMode: false,
+                fragLoadingTimeOut: 30000,
+                manifestLoadingTimeOut: 30000,
+                errorRecovery: true
+            });
             activeHls = hls;
             hls.loadSource(playUrl);
             hls.attachMedia(video);
@@ -1820,8 +1902,23 @@ async function renderStream(stream) {
                 restoreSeek(video);
                 if (playerSettings.autoPlay) video.play().catch(() => {});
             });
-            hls.on(Hls.Events.ERROR, (_, data) => {
-                if (data.fatal) { console.error('HLS fatal error', data.type, data.details); hls.destroy(); activeHls = null; }
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            console.log("Network error, trying to recover...");
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log("Media error, trying to recover...");
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            hls.destroy();
+                            activeHls = null;
+                            break;
+                    }
+                }
             });
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             video.src = playUrl;
@@ -1849,6 +1946,7 @@ function buildPlayerHtml() {
             <div class="player-spinner"></div>
         </div>
         <div class="player-center-icon" id="playerCenterIcon"></div>
+        <button class="skip-segment-btn" id="skipSegmentBtn" style="display:none">Skip Intro</button>
         <div class="video-controls" id="videoControls">
             <div class="progress-wrap" id="progressWrap">
                 <div class="progress-bg">
@@ -1878,9 +1976,9 @@ function buildPlayerHtml() {
                         </svg>
                     </button>
                     <span class="time-label"><span id="currentTime">0:00</span> / <span id="durationLabel">0:00</span></span>
+                    <span class="next-ep-countdown-player" id="nextEpCountdownPlayer"></span>
                 </div>
                 <div class="controls-right">
-                    <button class="ctrl-btn skip-segment-btn" id="skipSegmentBtn" style="display:none">Skip Intro</button>
                     <div class="settings-wrap">
                         <button class="ctrl-btn" id="settingsBtn" title="Settings">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
@@ -2107,11 +2205,15 @@ function attachVideoControls(video) {
         if (seg) video.currentTime = seg.end;
     });
 
+    let _progTick = 0;
     video.addEventListener('timeupdate', () => {
         const d = video.duration || 0;
         if (timeCur) timeCur.innerText = fmtTime(video.currentTime);
         if (pFill)   pFill.style.width = d ? `${(video.currentTime/d)*100}%` : '0%';
         handleSkipState(video);
+        // Save progress every ~30s
+        _progTick++;
+        if (_progTick % 30 === 0) saveCurrentProgress();
     });
     syncStripToggles();
     video.addEventListener('progress', () => {
@@ -2202,6 +2304,8 @@ function destroyHls() {
     activeVideo = null;
     currentSkipSegments = [];
     skippedSegmentKeys  = new Set();
+    clearInterval(countdownTimer);
+    countdownTimer = null;
 }
 function showPlayerUnavailable(anime, msg) {
     document.getElementById('playerStatus').innerText   = 'Unavailable';
@@ -2248,7 +2352,7 @@ function loadRoute() {
         const raw = decodeURIComponent(watchMatch[1]);
         const id = resolveId(raw);
         const ep = watchMatch[2];
-        if (id) { startStreaming(id, 'sub'); return; }
+        if (id) { startStreaming(id, 'sub', ep); return; }
     }
 
     if (/^\/trending/i.test(p))  return switchTab('trending', false);

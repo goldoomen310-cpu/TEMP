@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS watch_progress (
     title TEXT NOT NULL,
     poster TEXT,
     episode_number VARCHAR(10) NOT NULL,
+    current_time DOUBLE PRECISION DEFAULT 0,
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, anime_id)
 );
