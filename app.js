@@ -294,6 +294,7 @@ async function handleLogout() {
     try {
         await authFetch(`${API_BASE}/auth/logout`, { method: 'POST' });
     } catch { /* ignore */ }
+    localStorage.removeItem('anilist_token');
     currentUser = null;
     updateAuthUI();
     document.getElementById('userMenu').style.display = 'none';
@@ -2750,6 +2751,7 @@ async function checkAnilistEntry(malId) {
     if (!token || !malId) return;
     if (btnDet) btnDet.style.display = 'inline-flex';
     if (btnWat) btnWat.style.display = 'inline-flex';
+    
     try {
         const query = `query { Media(idMal: ${malId}, type: ANIME) { id mediaListEntry { id status progress score repeat startedAt { year month day } completedAt { year month day } } } }`;
         const res = await fetch('https://graphql.anilist.co', {
@@ -2763,7 +2765,6 @@ async function checkAnilistEntry(malId) {
         const title = entry ? "Updates your AniList anime status" : "Adds this anime to your AniList list";
         if (txtDet) { txtDet.innerText = txt; btnDet.title = title; }
         if (txtWat) { txtWat.innerText = txt; btnWat.title = title; }
-
         return entry;
     } catch (e) { console.error(e); }
 }
@@ -2786,9 +2787,10 @@ async function openAnilistModal(malId) {
     if (!malId) return;
     const autoEnabled = localStorage.getItem('anilist_auto_update') !== 'false';
     const progAutoBox = document.getElementById('alModalProgAuto');
-    progAutoBox.checked = autoEnabled;
+    progAutoBox.dataset.checked = autoEnabled ? 'true' : 'false';
+    progAutoBox.classList.toggle('active', autoEnabled);
     progAutoBox.disabled = !autoEnabled;
-    if(!autoEnabled) progAutoBox.parentElement.style.opacity = '0.5';
+    if(!autoEnabled) progAutoBox.style.opacity = '0.5';
 
     const entry = await checkAnilistEntry(malId);
 
@@ -2818,8 +2820,8 @@ async function saveAnilistModal() {
     let repeat = parseInt(document.getElementById('alModalRewatches').value) || 0;
 
     const isAutoStatus = status === 'AUTO';
-    const isAutoProg = document.getElementById('alModalProgAuto').checked;
-    const isAutoRewatch = document.getElementById('alModalRewatchAuto').checked;
+    const isAutoProg = document.getElementById('alModalProgAuto').dataset.checked === 'true';
+    const isAutoRewatch = document.getElementById('alModalRewatchAuto').dataset.checked === 'true';
 
     if (isAutoProg) {
         progress = currentEpisodeIndex !== undefined ? parseInt(currentEpisodes[currentEpisodeIndex]?.number || 0) : progress;

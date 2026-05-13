@@ -857,7 +857,7 @@ body.focus-active { overflow:hidden !important; }
   width:90%; max-width:600px; max-height:85vh;
   background:var(--bg-surface); border:1px solid var(--border);
   border-radius:var(--r-lg); display:flex; flex-direction:column;
-  overflow:hidden;
+  overflow-y:auto;
   transform:translateY(10px) scale(0.98);
   transition:transform 0.25s var(--ease);
 }
@@ -912,30 +912,36 @@ select.auth-input option {
     background-position: right 1rem center !important;
     background-size: 14px !important;
 }
-/* --- Simple Checkbox --- */
-.toggle-switch {
+/* =========================================
+   SIMPLE AUTO BUTTON TOGGLE
+   ========================================= */
+.simple-auto-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    height: 44px;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0 0.85rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
+    height: 44px;
     border-radius: var(--r-sm);
-    cursor: pointer;
-    color: var(--text-sub);
+    user-select: none;
+    flex-shrink: 0;
+    font-family: inherit;
     font-size: 0.85rem;
-    flex-shrink: 0;
-    white-space: nowrap;
-    box-sizing: border-box;
+    font-weight: 600;
+    color: var(--text-sub);
+    transition: all 0.25s ease;
+    outline: none;
 }
-.toggle-switch input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #3db4f2;
-    cursor: pointer;
-    margin: 0;
-    flex-shrink: 0;
+.simple-auto-toggle:hover {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+}
+.simple-auto-toggle.active {
+    color: #3db4f2;
+    border-color: #3db4f2;
+    background: rgba(61, 180, 242, 0.1);
 }
 /* --- Date Input Calendar Icon Fix --- */
 .premium-input[type="date"] { color-scheme: dark; }
@@ -962,6 +968,7 @@ select.auth-input option {
 /* ─── AniList Action Button ──────── */
 .anilist-action-btn { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; }
 .anilist-action-btn svg { flex-shrink:0; }
+
 
 /* ─── Auth Modal ──────────────────── */
 .auth-modal-overlay {
