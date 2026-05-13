@@ -1,12 +1,8 @@
-/**
- * AniView — client logic
- * Source: Senshi.live API via /api/*
- */
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+
 const API_BASE = window.API_BASE || '/api';
 
-// ─── Popunder ─────────────────────────────────────────────────────────────────
+
 const AD_URL = 'https://sorrowfulpsychology.com/bU3IV/0.Pm3sphv/bKmiVLJ/ZKD/0u3/MeDWMe5BMaDLAj5dLoTSc_wdMMzYk/wGMeTdMo';
 let _lastPop = 0;
 document.addEventListener('click', () => {
@@ -16,7 +12,7 @@ document.addEventListener('click', () => {
     window.open(AD_URL, '_blank');
 });
 
-// ─── State ────────────────────────────────────────────────────────────────────
+
 let currentUser            = null;
 let currentTab            = 'home';
 let currentTrendingPage   = 1;
@@ -40,15 +36,18 @@ let currentAnimepulseId   = null;
 let pendingSeekTime       = -1;
 let countdownTimer        = null;
 
+
 const defaultPlayerSettings = { autoSkip: true, autoNext: true, autoPlay: true };
 let playerSettings = (() => {
     try { return { ...defaultPlayerSettings, ...JSON.parse(localStorage.getItem('animepulseSettings') || '{}') }; }
     catch { return { ...defaultPlayerSettings }; }
 })();
 
+
 const animeDetailCache = new Map();
 const loadingOverlay   = document.getElementById('loadingOverlay');
 let loadingTimeout     = null;
+
 
 let loadingTimer = null;
 const showLoading = () => {
@@ -61,7 +60,7 @@ const hideLoading = () => {
     clearTimeout(loadingTimeout);
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function esc(v) {
     return String(v ?? '').replace(/[&<>"']/g, c =>
         ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -91,6 +90,7 @@ function fmtTime(sec) {
 function setRoute(p) { if (location.pathname !== p) history.pushState({},''  ,p); }
 function saveSettings() { localStorage.setItem('animepulseSettings', JSON.stringify(playerSettings)); }
 
+
 function posterFallbackDataUri(title = 'AniView') {
     const safe = String(title || 'AniView').trim().slice(0, 28) || 'AniView';
     const initials = safe.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'AP';
@@ -116,21 +116,23 @@ function displayTitle(anime) {
     return anime?.title || anime?.name || anime?.japaneseTitle || anime?.englishTitle || anime?.id || 'Anime';
 }
 
-// ─── API ──────────────────────────────────────────────────────────────────────
+
 async function apiFetch(url, opts = {}) {
     const res  = await fetch(url, opts);
     const text = await res.text();
     if (!res.ok) {
         let msg = `HTTP ${res.status}`;
-        try { msg = JSON.parse(text).error || msg; } catch { /* ignore */ }
+        try { msg = JSON.parse(text).error || msg; } catch {  }
         throw new Error(msg);
     }
     try { return JSON.parse(text); } catch { return text; }
 }
 
+
 async function authFetch(url, opts = {}) {
     return apiFetch(url, { ...opts, credentials: 'include' });
 }
+
 
 function updateAuthUI() {
     const btn = document.getElementById('authBtn');
@@ -154,6 +156,7 @@ function updateAuthUI() {
     if (!p || p === '/' || p.startsWith('/home')) renderContinueWatching();
 }
 
+
 async function checkAuth() {
     try {
         const data = await authFetch(`${API_BASE}/auth/me`);
@@ -166,11 +169,14 @@ async function checkAuth() {
     if (!p || p === '/' || p.startsWith('/home')) renderContinueWatching();
 }
 
+
 let _turnstileToken = '';
+
 
 function onTurnstileSuccess(token) { _turnstileToken = token; document.getElementById('authSubmitBtn').disabled = false; }
 function onTurnstileError()        { _turnstileToken = '';  document.getElementById('authSubmitBtn').disabled = true; }
 function onTurnstileExpired()      { _turnstileToken = '';  document.getElementById('authSubmitBtn').disabled = true; }
+
 
 function resetTurnstile() {
     _turnstileToken = '';
@@ -180,6 +186,7 @@ function resetTurnstile() {
         if (container) turnstile.reset(container);
     }
 }
+
 
 let authMode = 'login';
 function openAuthModal() {
@@ -293,14 +300,14 @@ async function handleLogin() {
 async function handleLogout() {
     try {
         await authFetch(`${API_BASE}/auth/logout`, { method: 'POST' });
-    } catch { /* ignore */ }
+    } catch {  }
     localStorage.removeItem('anilist_token');
     currentUser = null;
     updateAuthUI();
     document.getElementById('userMenu').style.display = 'none';
 }
 
-// Handle auth form submit
+
 document.addEventListener('submit', e => {
     if (e.target.id === 'authForm') {
         e.preventDefault();
@@ -309,7 +316,7 @@ document.addEventListener('submit', e => {
     }
 });
 
-// ─── Comments ─────────────────────────────────────────────────────────────────
+
 async function fetchComments(animeId, episodeNumber) {
     try {
         const data = await authFetch(
@@ -321,11 +328,13 @@ async function fetchComments(animeId, episodeNumber) {
     }
 }
 
+
 function renderComments(comments) {
     const section = document.getElementById('watchCommentsSection');
     const container = document.getElementById('commentsContainer');
     const form = document.getElementById('commentsForm');
     if (!section || !container) return;
+
 
     if (!comments || !comments.length) {
         container.innerHTML = currentUser
@@ -335,11 +344,13 @@ function renderComments(comments) {
         container.innerHTML = comments.map(c => renderCommentItem(c, false)).join('');
     }
 
+
     if (form) {
         form.style.display = currentUser ? '' : 'none';
     }
     section.style.display = '';
 }
+
 
 function renderCommentItem(c, isReply) {
     const voteClass = c.userVote === null ? '' : (c.userVote ? ' voted-up' : ' voted-down');
@@ -377,6 +388,7 @@ function renderCommentItem(c, isReply) {
     </div>`;
 }
 
+
 function toggleReply(commentId) {
     if (!currentUser) { openAuthModal(); return; }
     const form = document.getElementById('replyForm-' + commentId);
@@ -386,10 +398,12 @@ function toggleReply(commentId) {
     if (!shown) form.querySelector('textarea')?.focus();
 }
 
+
 function cancelReply(commentId) {
     const form = document.getElementById('replyForm-' + commentId);
     if (form) { form.style.display = 'none'; form.querySelector('textarea').value = ''; }
 }
+
 
 async function postReply(commentId) {
     if (!currentUser) { openAuthModal(); return; }
@@ -399,9 +413,11 @@ async function postReply(commentId) {
     const content = input?.value?.trim();
     if (!content || content.length > 2000) return;
 
+
     const animeId = currentAnimeId;
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!animeId || !ep?.number) return;
+
 
     try {
         await authFetch(
@@ -420,11 +436,13 @@ async function postReply(commentId) {
     }
 }
 
+
 async function handleVote(commentId, isLike) {
     if (!currentUser) { openAuthModal(); return; }
     const animeId = currentAnimeId;
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!animeId || !ep?.number) return;
+
 
     try {
         await authFetch(
@@ -441,6 +459,7 @@ async function handleVote(commentId, isLike) {
     }
 }
 
+
 function fmtCommentTime(ts) {
     if (!ts) return '';
     const d = new Date(ts);
@@ -456,6 +475,7 @@ function fmtCommentTime(ts) {
     return d.toLocaleDateString();
 }
 
+
 async function postComment() {
     if (!currentUser) {
         openAuthModal();
@@ -466,9 +486,11 @@ async function postComment() {
     if (!content) return;
     if (content.length > 2000) return;
 
+
     const animeId = currentAnimeId;
     const ep = currentEpisodes[currentEpisodeIndex];
     if (!animeId || !ep?.number) return;
+
 
     try {
         await authFetch(
@@ -486,6 +508,7 @@ async function postComment() {
     }
 }
 
+
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.ctrlKey && document.activeElement?.id === 'commentInput') {
         e.preventDefault();
@@ -493,13 +516,13 @@ document.addEventListener('keydown', e => {
     }
 });
 
-// ─── Schedule normalizer ──────────────────────────────────────────────────────
-// ─── Source badge helper ──────────────────────────────────────────────────────
+
+
 function sourceBadge(src) {
     return '';
 }
 
-// ─── Anime card ───────────────────────────────────────────────────────────────
+
 function createAnimeCard(anime) {
     if (anime?.id) animeDetailCache.set(String(anime.id), anime);
     const status = normStatus(anime.status);
@@ -530,6 +553,7 @@ function createAnimeCard(anime) {
         </div>`;
 }
 
+
 function renderGrid(gridId, list, empty) {
     const g = document.getElementById(gridId);
     if (!g) return;
@@ -538,7 +562,7 @@ function renderGrid(gridId, list, empty) {
         : `<div class="player-empty" style="grid-column:1/-1;padding:4rem">${esc(empty)}</div>`;
 }
 
-// ─── Tab routing ──────────────────────────────────────────────────────────────
+
 function switchTab(tabId, updateRoute = true) {
     if (currentTab === tabId && tabId !== 'home') return;
     if (currentTab === 'watch' && tabId !== 'watch') { destroyHls(); if (activeVideo) { activeVideo.pause(); activeVideo = null; } }
@@ -561,19 +585,23 @@ function loadTabData(tabId) {
     else if (tabId === 'settings') loadSettingsPage();
 }
 
-// ─── Home (only Anilist discover sections, no old data sources) ─────────────
+
 const CAROUSEL_SKELETON = '<div class="carousel-skeleton"><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div></div>';
 const DETAIL_SKELETON = '<div class="detail-skeleton"><div class="sk-banner"></div><div class="sk-body"><div class="sk-poster"></div><div class="sk-info"><div class="sk-line w-60"></div><div class="sk-line w-40"></div><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-70"></div></div></div></div>';
 
+
 let _homeDataFetched = 0;
 async function fetchHomeData() {
-    // Don't re-fetch if loaded within last 2 minutes
+
+
     if (_homeDataFetched && Date.now() - _homeDataFetched < 120000) return;
-    // Show loading skeleton in all carousels
+
+
     ['discoverTrending', 'discoverPopularSeason', 'discoverUpcoming', 'discoverAlltime'].forEach(id => {
         const el = document.getElementById(id);
         if (el && !el.children.length) el.innerHTML = CAROUSEL_SKELETON;
     });
+
 
     try {
         const [discTrend, discPopSea, discUpc, discAll] = await Promise.allSettled([
@@ -583,6 +611,7 @@ async function fetchHomeData() {
             apiFetch(`${API_BASE}/anilist/popular-alltime?page=1`)
         ]);
 
+
         const discData = [
             { id: 'discoverTrending',       data: discTrend.status === 'fulfilled' ? discTrend.value.results || [] : [] },
             { id: 'discoverPopularSeason',  data: discPopSea.status === 'fulfilled' ? discPopSea.value.results || [] : [] },
@@ -590,7 +619,9 @@ async function fetchHomeData() {
             { id: 'discoverAlltime',        data: discAll.status === 'fulfilled' ? discAll.value.results || [] : [] }
         ];
 
+
         discData.flatMap(d => d.data).forEach(a => { if (a?.id) animeDetailCache.set(String(a.id), a); });
+
 
         for (const { id, data } of discData) {
             const el = document.getElementById(id);
@@ -600,27 +631,30 @@ async function fetchHomeData() {
         }
         _homeDataFetched = Date.now();
 
-        // Spotlight from popular-season data (pick up to 9 random)
+
         const popSeaData = discPopSea.status === 'fulfilled' ? discPopSea.value.results || [] : [];
         if (popSeaData.length) initSpotlight(popSeaData);
 
-        // Top 10 Trending sidebar
+
         const trendData = discTrend.status === 'fulfilled' ? discTrend.value.results || [] : [];
         renderSidebarTrending(trendData.slice(0, 10));
     } catch (e) { console.error('Home data error', e); }
-    // Ensure sidebar shows something even on error
+
+
     const list = document.getElementById('sidebarTrendingList');
     if (list && list.querySelector('.empty-sidebar')) {
         renderSidebarTrending([]);
     }
 }
 
-// ─── Continue Watching ─────────────────────────────────────────────────────────
+
 const CW_KEY = 'animepulse_watch_progress';
+
 
 function saveWatchProgress(animeId, epNumber, title, poster, malId, currentTime) {
     const entry = { anime_id: animeId, mal_id: malId || '', title, poster: poster || '', episode_number: String(epNumber), current_time: currentTime || 0, updated_at: Date.now() };
-    // Always save to localStorage for guests
+
+
     try {
         let list = JSON.parse(localStorage.getItem(CW_KEY) || '[]');
         const idx = list.findIndex(e => e.anime_id === animeId);
@@ -628,8 +662,9 @@ function saveWatchProgress(animeId, epNumber, title, poster, malId, currentTime)
         else list.unshift(entry);
         list.sort((a, b) => b.updated_at - a.updated_at);
         localStorage.setItem(CW_KEY, JSON.stringify(list.slice(0, 20)));
-    } catch { /* ignore */ }
-    // Sync to server if signed in
+    } catch {  }
+
+
     if (currentUser) {
         authFetch(`${API_BASE}/watch-progress`, {
             method: 'POST',
@@ -638,6 +673,7 @@ function saveWatchProgress(animeId, epNumber, title, poster, malId, currentTime)
         }).catch(() => {});
     }
 }
+
 
 function saveCurrentProgress() {
     const video = document.getElementById('animeVideo');
@@ -655,9 +691,11 @@ function saveCurrentProgress() {
     );
 }
 
+
 function getLocalWatchProgress() {
     try { return JSON.parse(localStorage.getItem(CW_KEY) || '[]'); } catch { return []; }
 }
+
 
 async function renderContinueWatching() {
     const section = document.getElementById('continueWatchingSection');
@@ -678,7 +716,7 @@ async function renderContinueWatching() {
     section.style.display = '';
 }
 
-// ─── Spotlight ─────────────────────────────────────────────────────────────────
+
 let _spotIdx = 0, _spotItems = [], _spotTimer = null;
 function initSpotlight(items) {
     const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, 9);
@@ -731,7 +769,7 @@ function spotlightPrev() {
     spotlightGo((_spotIdx - 1 + _spotItems.length) % _spotItems.length);
 }
 
-// ─── Countdown formatter ─────────────────────────────────────────────────────
+
 function formatCountdown(totalSeconds) {
     const d = Math.floor(totalSeconds / (3600 * 24));
     const h = Math.floor((totalSeconds % (3600 * 24)) / 3600);
@@ -740,6 +778,7 @@ function formatCountdown(totalSeconds) {
     const pad = (num) => num.toString().padStart(2, '0');
     return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(s)}`;
 }
+
 
 function formatShortCountdown(totalSeconds) {
     if (totalSeconds <= 0) return 'Airing now';
@@ -750,8 +789,9 @@ function formatShortCountdown(totalSeconds) {
     return `${d}d ${h}h ${m}m ${s}s`;
 }
 
-// ─── Carousel pagination (6 per page) ────────────────────────────────────────
+
 const _carouselData = new Map();
+
 
 function renderCarouselPage(id) {
     const state = _carouselData.get(id);
@@ -763,13 +803,15 @@ function renderCarouselPage(id) {
     carousel.innerHTML = pageData.map(state.renderFn).join('');
 }
 
+
 function initCarousel(id, allData, renderFn = createAnimeCard) {
     const carousel = document.getElementById(id);
     if (!carousel || !allData) return;
 
+
     const isMobile = window.innerWidth < 768;
 
-    // Already initialized – update stored data and re-render
+
     if (carousel.dataset.cInit) {
         const state = _carouselData.get(id);
         if (state) {
@@ -788,6 +830,7 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
     }
     carousel.dataset.cInit = '1';
 
+
     let wrap = carousel.parentElement;
     if (!wrap.classList.contains('carousel-wrap')) {
         wrap = document.createElement('div');
@@ -796,18 +839,22 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
         wrap.appendChild(carousel);
     }
 
+
     const leftBtn = document.createElement('button');
     leftBtn.className = 'carousel-btn carousel-btn-left';
     leftBtn.setAttribute('aria-label', 'Previous');
     leftBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="15,18 9,12 15,6"/></svg>';
+
 
     const rightBtn = document.createElement('button');
     rightBtn.className = 'carousel-btn carousel-btn-right';
     rightBtn.setAttribute('aria-label', 'Next');
     rightBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="9,6 15,12 9,18"/></svg>';
 
+
     wrap.appendChild(leftBtn);
     wrap.appendChild(rightBtn);
+
 
     if (isMobile) {
         leftBtn.style.display = 'none';
@@ -818,15 +865,19 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
         return;
     }
 
+
     const totalPages = Math.max(1, Math.ceil(allData.length / 6));
     _carouselData.set(id, { data: allData, page: 0, totalPages, renderFn });
+
 
     function syncArrowVisibility(state) {
         leftBtn.style.display = state.page <= 0 ? 'none' : '';
         rightBtn.style.display = state.page >= state.totalPages - 1 ? 'none' : '';
     }
 
+
     if (totalPages <= 1) { leftBtn.style.display = 'none'; rightBtn.style.display = 'none'; }
+
 
     leftBtn.addEventListener('click', () => {
         const s = _carouselData.get(id);
@@ -836,6 +887,7 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
         syncArrowVisibility(s);
     });
 
+
     rightBtn.addEventListener('click', () => {
         const s = _carouselData.get(id);
         if (!s || s.page >= s.totalPages - 1) return;
@@ -844,8 +896,10 @@ function initCarousel(id, allData, renderFn = createAnimeCard) {
         syncArrowVisibility(s);
     });
 
+
     renderCarouselPage(id);
 }
+
 
 function createContinueWatchingCard(p) {
     const cardId = p.anime_id || p.id;
@@ -863,6 +917,7 @@ function createContinueWatchingCard(p) {
     </div>`;
 }
 
+
 function resumeAnime(id, seekTime, epNum) {
     if (seekTime > 0) pendingSeekTime = seekTime;
     const cleanId = stripSourcePrefix(id);
@@ -872,7 +927,7 @@ function resumeAnime(id, seekTime, epNum) {
     loadRoute();
 }
 
-// ─── Sidebar helpers ───────────────────────────────────────────────────────────
+
 function renderSidebarTrending(items) {
     const list = document.getElementById('sidebarTrendingList');
     if (!list) return;
@@ -892,7 +947,9 @@ function renderSidebarTrending(items) {
     }).join('');
 }
 
+
 const SIDEBAR_GENRES = ['Action','Adventure','Comedy','Drama','Romance','Sci-Fi','Fantasy','Horror','Slice of Life','Mystery','Thriller','Sports'];
+
 
 function initSidebarGenres() {
     const chips = document.getElementById('sidebarGenres');
@@ -901,6 +958,7 @@ function initSidebarGenres() {
         `<span class="genre-chip" onclick="sidebarGenreClick('${esc(g)}')">${esc(g)}</span>`
     ).join('');
 }
+
 
 function sidebarGenreClick(genre) {
     const input = document.getElementById('advSearchInput');
@@ -913,7 +971,7 @@ function sidebarGenreClick(genre) {
     }, 100);
 }
 
-// ─── Multi-select dropdown helpers ──────────────────────────────────────────
+
 function toggleMS(btn) {
     const wrap = btn.closest('.mselect-wrap');
     if (!wrap) return;
@@ -923,6 +981,7 @@ function toggleMS(btn) {
     });
 }
 
+
 function getMSValues(name) {
     const wrap = document.querySelector(`.mselect-wrap[data-mselect="${name}"]`);
     if (!wrap) return [];
@@ -930,10 +989,12 @@ function getMSValues(name) {
     return Array.from(checked).map(cb => cb.value);
 }
 
+
 function getMSSort() {
     const sel = document.querySelector('input[name="ms-sort"]:checked');
     return sel ? sel.value : '';
 }
+
 
 function updateMSTriggerText() {
     document.querySelectorAll('.mselect-wrap').forEach(wrap => {
@@ -956,9 +1017,11 @@ function updateMSTriggerText() {
     });
 }
 
+
 function onMSChange(el) {
     updateMSTriggerText();
-    // Close dropdown on select
+
+
     const wrap = el.closest('.mselect-wrap');
     if (wrap && wrap.dataset.mselect === 'sort') {
         wrap.classList.remove('open');
@@ -966,14 +1029,14 @@ function onMSChange(el) {
     executeSearch();
 }
 
-// Close dropdowns on outside click
+
 document.addEventListener('click', e => {
     if (!e.target.closest('.mselect-wrap')) {
         document.querySelectorAll('.mselect-wrap.open').forEach(w => w.classList.remove('open'));
     }
 });
 
-// ─── Trending (Anilist, infinite scroll with load more) ─────────────────────
+
 async function fetchTrendingGridV2(append = false) {
     if (!append) {
         const grid = document.getElementById('trendingGrid');
@@ -992,13 +1055,15 @@ async function fetchTrendingGridV2(append = false) {
     } catch (e) { console.error(e); renderGrid('trendingGrid', [], 'Failed to load trending.'); }
 }
 
+
 function loadMoreTrending() {
     currentTrendingPage++;
     fetchTrendingGridV2(true);
 }
 
-// ─── Search V2 (Senshi + Consumet fallback, paginated) ──────────────────────
+
 let currentSearchQueryV2 = '';
+
 
 async function fetchSearchGridV2(append = false) {
     try {
@@ -1010,10 +1075,13 @@ async function fetchSearchGridV2(append = false) {
         const format = getMSValues('format').join(',');
         const status = getMSValues('status').join(',');
 
+
         const hasFilters = genre || year || season || format || status;
 
+
         if (!query && !hasFilters) {
-            // No query/no filters: show some results (trending)
+
+
             let data;
             try { data = await apiFetch(`${API_BASE}/anilist/trending?page=1`); } catch {}
             const results = data?.results || [];
@@ -1028,6 +1096,7 @@ async function fetchSearchGridV2(append = false) {
             document.getElementById('loadMoreSearch').style.display = 'none';
             return;
         }
+
 
         currentSearchQueryV2 = query;
         let url = `${API_BASE}/search/${encodeURIComponent(query || '')}?page=${currentSearchPage}`;
@@ -1052,18 +1121,19 @@ async function fetchSearchGridV2(append = false) {
     } catch (e) { console.error(e); renderGrid('searchGrid', [], 'Search failed.'); }
 }
 
-// Keep old search for backward compat
+
 async function executeSearch() {
     currentSearchPage = 1;
     fetchSearchGridV2();
 }
+
 
 async function loadMoreSearch() {
     currentSearchPage++;
     fetchSearchGridV2(true);
 }
 
-// ─── Seasonal (Anilist popular this season) ─────────────────────────────────
+
 async function fetchSeasonalGrid() {
     const grid = document.getElementById('seasonalGrid');
     if (grid && !grid.children.length) grid.innerHTML = CAROUSEL_SKELETON;
@@ -1078,7 +1148,7 @@ async function fetchSeasonalGrid() {
     } catch (e) { renderGrid('seasonalGrid', [], 'No seasonal titles found.'); }
 }
 
-// ─── Schedule (Anilist weekly calendar) ─────────────────────────────────────
+
 async function fetchScheduleGrid() {
     const grid = document.getElementById('scheduleGrid');
     if (grid && !grid.children.length) grid.innerHTML = CAROUSEL_SKELETON;
@@ -1110,6 +1180,7 @@ async function fetchScheduleGrid() {
     } catch (e) { console.error(e); }
 }
 
+
 function fmtAiringTime(ts) {
     if (!ts) return 'Soon';
     const d = new Date(ts * 1000);
@@ -1125,7 +1196,7 @@ function fmtAiringTime(ts) {
     return `${days}d ${hrs % 24}h`;
 }
 
-// ─── URL helpers ───────────────────────────────────────────────────────────────
+
 function stripSourcePrefix(id) {
     return String(id).replace(/^(animepulse:|anilist:|gogo:|senshi:)/, '');
 }
@@ -1136,7 +1207,7 @@ function resolveId(cleanId) {
     try { return sessionStorage.getItem('idmap_'+cleanId) || cleanId; } catch { return cleanId; }
 }
 
-// ─── Detail ───────────────────────────────────────────────────────────────────
+
 async function getAnimeDetail(id, animepulseId) {
     const cached = animeDetailCache.get(String(id));
     if (cached?._detailFetched) return cached;
@@ -1154,8 +1225,10 @@ async function getAnimeDetail(id, animepulseId) {
     }
 }
 
+
 async function viewAnimeDetails(id) {
-    // Show loading skeleton immediately
+
+
     document.getElementById('detailContainer').innerHTML = DETAIL_SKELETON;
     document.getElementById('episodesSection').style.display = 'none';
         lastDetailPageId = id;
@@ -1169,6 +1242,7 @@ async function viewAnimeDetails(id) {
         const anime = await getAnimeDetail(id, cachedCard?.animepulseId);
         currentAnimeDetail = anime;
 
+
         const isGogo  = String(id).startsWith('gogo:') || String(anime.id).startsWith('gogo:');
         const isAnilist = String(id).startsWith('anilist:') || String(anime.id).startsWith('anilist:');
         const status   = normStatus(anime.status);
@@ -1181,12 +1255,13 @@ async function viewAnimeDetails(id) {
         else if (isAnilist) sourceBadge = '';
         else sourceBadge = '';
 
-        // Store episodes for grid
+
         let episodeList = anime.episodeList || [];
         if (!episodeList.length && anime.subEpisodes) {
             episodeList = anime.subEpisodes.map(n => ({ id: String(n), number: String(n), title: `Episode ${n}` }));
         }
         window._detailEpisodes = episodeList;
+
 
         const detailRows = [
             { label: 'Type',        value: clean(anime.type) },
@@ -1201,6 +1276,7 @@ async function viewAnimeDetails(id) {
         ].filter(r => r.value).map(r =>
             `<div class="detail-info-row"><span class="detail-info-label">${r.label}</span><span class="detail-info-value">${esc(r.value)}</span></div>`
         ).join('');
+
 
         document.getElementById('detailContainer').innerHTML = `
             <div class="detail-header">
@@ -1277,7 +1353,7 @@ async function viewAnimeDetails(id) {
             </div>` : ''}`;
         showAnilistStatusDropdown();
 
-        // Start tickers for countdowns (dd:hh:mm:ss)
+
         document.querySelectorAll('.next-ep-countdown').forEach(cd => {
             function tick() {
                 const left = Math.max(0, (Number(cd.dataset.airing) * 1000) - Date.now());
@@ -1288,7 +1364,7 @@ async function viewAnimeDetails(id) {
             setInterval(tick, 1000);
         });
 
-        // Render episode grid
+
         const epSection = document.getElementById('episodesSection');
         const epGrid    = document.getElementById('episodesGrid');
         const epCountEl = document.getElementById('episodesSectionCount');
@@ -1302,7 +1378,7 @@ async function viewAnimeDetails(id) {
             }
         }
 
-        // Cast section
+
         const castContainer = document.getElementById('watchCastContainer');
         if (castContainer && anime.characters?.length) {
             castContainer.style.display = '';
@@ -1331,7 +1407,7 @@ async function viewAnimeDetails(id) {
                 </div>`;
         }
 
-        // Next episode airing countdown
+
         const nextEpContainer = document.getElementById('watchNextEpContainer');
         if (nextEpContainer && anime.nextAiringEpisode) {
             const ne = anime.nextAiringEpisode;
@@ -1344,7 +1420,8 @@ async function viewAnimeDetails(id) {
                 <div class="next-ep-info">
                     <strong>Episode ${esc(String(ne.episode))}</strong> airing <span class="next-ep-countdown" data-airing="${ne.airingAt}"></span>
                 </div>`;
-            // Start countdown (dd:hh:mm:ss)
+
+
             const cd = nextEpContainer.querySelector('.next-ep-countdown');
             if (cd) {
                 function tick() {
@@ -1357,10 +1434,11 @@ async function viewAnimeDetails(id) {
             }
         }
 
-        // More Like This
+
         fetchMoreLikeThis(anime.genres, anime.premiered);
     } catch (e) { console.error(e); }
 }
+
 
 function renderEpisodeGrid(eps) {
     const grid = document.getElementById('episodesGrid');
@@ -1376,6 +1454,7 @@ function renderEpisodeGrid(eps) {
             ${ep.filler ? '<span class="ep-fill-tag">FILLER</span>' : ''}
         </button>`).join('');
 }
+
 
 async function fetchMoreLikeThis(genres, premiered) {
     const section = document.getElementById('moreLikeThis');
@@ -1397,6 +1476,7 @@ async function fetchMoreLikeThis(genres, premiered) {
     } catch { section.style.display = 'none'; }
 }
 
+
 function filterEpisodes(query) {
     const grid = document.getElementById('episodesGrid');
     if (!grid) return;
@@ -1414,6 +1494,7 @@ function filterEpisodes(query) {
             ${ep.filler ? '<span class="ep-fill-tag">FILLER</span>' : ''}
         </button>`).join('');
 }
+
 
 function filterWatchEpisodes(query) {
     const q = query.toLowerCase();
@@ -1435,7 +1516,7 @@ function filterWatchEpisodes(query) {
     document.getElementById('seeAllEpisodesBtn').style.display = 'none';
 }
 
-// ─── Anilist Enrichment ────────────────────────────────────────────────────────
+
 async function fetchAnilistEnrich(title) {
     try {
         const data = await apiFetch(`${API_BASE}/anilist/enrich?title=${encodeURIComponent(title)}`);
@@ -1488,10 +1569,10 @@ async function fetchAnilistEnrich(title) {
                 container.appendChild(el);
             }
         }
-    } catch { /* enrichment optional */ }
+    } catch {  }
 }
 
-// ─── Streaming ────────────────────────────────────────────────────────────────
+
 async function startStreaming(id, lang = 'sub', autoEp) {
     currentAnimeId      = id;
     currentMalId        = null;
@@ -1499,8 +1580,10 @@ async function startStreaming(id, lang = 'sub', autoEp) {
     currentEpisodes     = [];
     currentEpisodeIndex = 0;
 
+
     const epList    = document.getElementById('episodesList');
     const vidCont   = document.getElementById('videoContainer');
+
 
     document.getElementById('playerStatus').innerText  = 'Loading';
     document.getElementById('episodesCount').innerText = '0';
@@ -1511,6 +1594,7 @@ async function startStreaming(id, lang = 'sub', autoEp) {
     document.getElementById('moreLikeThis').style.display = 'none';
     switchTab('watch', false);
 
+
     try {
         currentAnimeDetail = await getAnimeDetail(id);
         currentMalId = currentAnimeDetail.malId;
@@ -1520,11 +1604,11 @@ async function startStreaming(id, lang = 'sub', autoEp) {
         storeIdMapping(cleanWatchId, currentAnimeId || String(id));
         setRoute(`/watch/${encodeURIComponent(cleanWatchId)}/ep-1`);
 
-        // Set current server
+
         currentServersAvail = currentAnimeDetail.servers || ['senshi'];
         currentServer = currentServersAvail.includes('senshi') ? 'senshi' : currentServersAvail[0];
 
-        // Info card
+
         const info = document.getElementById('watchDetailsContainer');
         if (info) {
             const a = currentAnimeDetail;
@@ -1553,7 +1637,7 @@ async function startStreaming(id, lang = 'sub', autoEp) {
                 </div>`;
         }
 
-        // Render cast, next episode, studio from currentAnimeDetail
+
         const castContainer = document.getElementById('watchCastContainer');
         if (castContainer && currentAnimeDetail.characters?.length) {
             castContainer.style.display = '';
@@ -1606,14 +1690,15 @@ async function startStreaming(id, lang = 'sub', autoEp) {
             }
         }
 
-        // Anilist enrichment for cast/next-ep (server-cached, always fetches)
+
         fetchAnilistEnrich(displayTitle(currentAnimeDetail));
 
-        // Build episode list from episodeList (Senshi format) or subEpisodes
+
         const episodeList = currentAnimeDetail.episodeList || [];
         const subEps = currentAnimeDetail.subEpisodes || [];
         const dubEps = currentAnimeDetail.dubEpisodes || [];
         if (lang === 'dub' && !(dubEps.length > 0 || currentAnimeDetail.hasDub)) currentLang = 'sub';
+
 
         if (episodeList.length) {
             currentEpisodes = episodeList.map(ep => ({
@@ -1630,10 +1715,12 @@ async function startStreaming(id, lang = 'sub', autoEp) {
             currentEpisodes = subEps.map(n => ({ id: String(n), number: String(n), title: `Episode ${n}` }));
         }
 
+
         if (!currentEpisodes.length) {
             showPlayerUnavailable(currentAnimeDetail, 'No episodes found for this title.');
             return;
         }
+
 
         renderServerStrip();
         renderEpisodeList();
@@ -1650,6 +1737,7 @@ async function startStreaming(id, lang = 'sub', autoEp) {
     }
 }
 
+
 function renderServerStrip() {
     const picker = document.getElementById('serverPicker');
     const strip  = document.getElementById('serverStrip');
@@ -1662,7 +1750,8 @@ function renderServerStrip() {
             onclick='switchServer(${JSON.stringify(s)})'>
             ${labels[s] || s}
         </button>`).join('');
-    // Update lang toggle visibility — only show when both choices exist
+
+
     if (toggle) {
         const hasBoth = currentServer === 'animepulse'
             ? (currentAnimeDetail?.dubEpisodes?.length > 0)
@@ -1674,6 +1763,7 @@ function renderServerStrip() {
     }
 }
 
+
 async function switchServer(server) {
     if (server === currentServer) return;
     pendingSeekTime = activeVideo?.currentTime || -1;
@@ -1683,6 +1773,7 @@ async function switchServer(server) {
         await playEpisode(currentEpisodeIndex, document.querySelector('.episode-item.active'));
     }
 }
+
 
 function renderEpisodeList() {
     document.getElementById('episodesCount').innerText = currentEpisodes.length;
@@ -1703,6 +1794,7 @@ function renderEpisodeList() {
     const seeAllBtn = document.getElementById('seeAllEpisodesBtn');
     if (seeAllBtn) seeAllBtn.style.display = total > 8 ? '' : 'none';
 }
+
 
 function openEpisodeModal() {
     const grid = document.getElementById('episodeModalGrid');
@@ -1732,6 +1824,7 @@ function filterModalEpisodes(val) {
     });
 }
 
+
 async function switchLang(lang) {
     if (lang === currentLang) return;
     pendingSeekTime = activeVideo?.currentTime || -1;
@@ -1742,6 +1835,7 @@ async function switchLang(lang) {
         await playEpisode(currentEpisodeIndex, document.querySelector('.episode-item.active'));
     }
 }
+
 
 async function playEpisode(index, _element) {
     const ep = currentEpisodes[index];
@@ -1762,7 +1856,7 @@ async function playEpisode(index, _element) {
     document.getElementById('playerStatus').innerText = `Loading EP ${ep.number}`;
     vc.innerHTML = `<div class="player-empty">Loading episode ${esc(ep.number)}…</div>`;
 
-    // Save watch progress
+
     const detail = currentAnimeDetail;
     if (detail) {
         saveWatchProgress(
@@ -1774,7 +1868,7 @@ async function playEpisode(index, _element) {
         );
     }
 
-    // Load comments for this episode
+
     const commentSection = document.getElementById('watchCommentsSection');
     if (commentSection) {
         const commentsForm = document.getElementById('commentsForm');
@@ -1782,8 +1876,10 @@ async function playEpisode(index, _element) {
         fetchComments(currentAnimeId || currentMalId || id, ep.number);
     }
 
+
     try {
-        // Route to correct streaming source based on currentServer
+
+
         let streamKey;
         if (currentServer === 'animepulse') {
             streamKey = currentAnimepulseId ? `animepulse:${currentAnimepulseId}` : currentAnimeDetail?.animepulseId || currentAnimeDetail?.id;
@@ -1794,14 +1890,16 @@ async function playEpisode(index, _element) {
         }
         if (!streamKey) throw new Error('Missing ID for stream lookup');
 
+
         const epParam = String(streamKey).startsWith('gogo:') && ep.id ? ep.id : ep.number;
         const stream = await apiFetch(`${API_BASE}/stream?malId=${encodeURIComponent(streamKey)}&ep=${encodeURIComponent(epParam)}&lang=${encodeURIComponent(currentLang)}`);
         console.log(`[playEpisode] server=${currentServer} lang=${currentLang} selected_status=${stream?.status} streams=`, stream?.streams?.map(s=>s.status));
         if (!stream?.url && !stream?.sources?.length) throw new Error('No stream URL returned');
 
+
         document.getElementById('playerStatus').innerText = `EP ${ep.number}`;
 
-        // Use the preferred source matching stream.status, or stream.url
+
         const preferred = stream.sources?.find(s => s.quality === stream.status) || stream.sources?.[0];
         if (preferred) {
             renderStream(preferred);
@@ -1814,6 +1912,7 @@ async function playEpisode(index, _element) {
     }
 }
 
+
 function syncStripToggles() {
     const sn = document.getElementById('stripAutoNext');
     const sp = document.getElementById('stripAutoPlay');
@@ -1823,6 +1922,7 @@ function syncStripToggles() {
     if (ss) ss.checked = !!playerSettings.autoSkip;
 }
 
+
 function prevEpisode() {
     const ni  = currentEpisodeIndex - 1;
     if (ni < 0) return;
@@ -1830,12 +1930,14 @@ function prevEpisode() {
     playEpisode(ni, nel || null);
 }
 
+
 function nextEpisode() {
     const ni  = currentEpisodeIndex + 1;
     if (ni >= currentEpisodes.length) return;
     const nel = document.querySelectorAll('.episode-item')[ni];
     playEpisode(ni, nel || null);
 }
+
 
 function toggleFocusMode() {
     const player = document.getElementById('videoPlayer');
@@ -1847,9 +1949,10 @@ function toggleFocusMode() {
     }
 }
 
-// ─── Stream renderer ──────────────────────────────────────────────────────────
+
 let currentStreams = []; // multi-source support
 let activeStreamIndex = 0;
+
 
 function restoreSeek(video) {
     if (pendingSeekTime > 0) {
@@ -1857,6 +1960,7 @@ function restoreSeek(video) {
         pendingSeekTime = -1;
     }
 }
+
 
 function waitForHls(ms = 5000) {
     return new Promise(r => {
@@ -1868,21 +1972,23 @@ function waitForHls(ms = 5000) {
     });
 }
 
+
 async function renderStream(stream) {
     destroyHls();
     const vc = document.getElementById('videoContainer');
     if (!vc) return;
 
-    // Server already returns proxied URLs for HLS streams (e.g. /api/media?url=...)
-    // Trust the isM3U8 flag rather than trying to detect from the URL
+
+
     const isM3U8 = stream.isM3U8 !== false;
     const playUrl = stream.url;
+
 
     vc.innerHTML = buildPlayerHtml();
     const video  = document.getElementById('animeVideo');
     activeVideo  = video;
 
-    // Start countdown ticker for next episode airing
+
     clearInterval(countdownTimer);
     countdownTimer = setInterval(() => {
         const el = document.getElementById('nextEpCountdownPlayer');
@@ -1897,10 +2003,12 @@ async function renderStream(stream) {
         }
     }, 1000);
 
+
     function showLoading(show) {
         const el = document.getElementById('playerLoading');
         if (el) el.classList.toggle('visible', show);
     }
+
 
     if (isM3U8) {
         await waitForHls();
@@ -1958,6 +2066,7 @@ async function renderStream(stream) {
     }
     attachVideoControls(video);
 }
+
 
 function buildPlayerHtml() {
     return `
@@ -2037,6 +2146,7 @@ function buildPlayerHtml() {
     </div>`;
 }
 
+
 function attachVideoControls(video) {
     const player    = document.getElementById('videoPlayer');
     const playBtn   = document.getElementById('playToggle');
@@ -2054,7 +2164,7 @@ function attachVideoControls(video) {
     const setPanel  = document.getElementById('settingsPanel');
     if (!player) return;
 
-    // Show/hide controls + center icon + cursor with 3s idle timeout
+
     const ctrlEl = document.querySelector('.video-controls');
     let idleTimer;
     const hideAll = () => {
@@ -2081,7 +2191,7 @@ function attachVideoControls(video) {
         else video.pause();
     });
 
-    // Touch: show center icon on tap, toggle controls
+
     let lastTap = 0, lastTapX = 0;
     const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     player.addEventListener('touchend', (e) => {
@@ -2089,7 +2199,8 @@ function attachVideoControls(video) {
         const now = Date.now();
         const dx = e.changedTouches[0].clientX;
         const dt = now - lastTap;
-        // Double-tap seek on mobile
+
+
         if (isMobile && dt < 300 && dt > 30) {
             const rect = player.getBoundingClientRect();
             if (dx > rect.left + rect.width / 2) {
@@ -2116,9 +2227,10 @@ function attachVideoControls(video) {
         }
     }, { passive: true });
 
-    // Play / pause icons
+
     const PLAY  = `<svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><polygon points="5 3 19 12 5 21"/></svg>`;
     const PAUSE = `<svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+
 
     function flashCenterIcon(icon) {
         const el = document.getElementById('playerCenterIcon');
@@ -2135,11 +2247,12 @@ function attachVideoControls(video) {
     video.addEventListener('play',  () => { if (playBtn) playBtn.innerHTML = PAUSE; showCtrl(); });
     video.addEventListener('pause', () => { if (playBtn) playBtn.innerHTML = PLAY;  showCtrl(); });
 
+
     rwdBtn?.addEventListener('click', () => { video.currentTime = Math.max(0, video.currentTime - 10); });
     fwdBtn?.addEventListener('click', () => { video.currentTime = Math.min(video.duration||Infinity, video.currentTime + 10); });
     nextBtn?.addEventListener('click', nextEpisode);
 
-    // Settings panel toggle
+
     function populateQualityOptions() {
         const ql = document.getElementById('qualityOptions');
         if (!ql || !activeHls) return;
@@ -2165,7 +2278,7 @@ function attachVideoControls(video) {
     document.addEventListener('click', closeSettings);
     setPanel?.addEventListener('click', e => e.stopPropagation());
 
-    // Settings option clicks
+
     function applySpeed(speed) {
         const s = parseFloat(speed);
         if (isNaN(s) || !video) return;
@@ -2187,10 +2300,12 @@ function attachVideoControls(video) {
         if (b) applyQuality(b.dataset.level);
     });
 
+
     fsBtn?.addEventListener('click', () => {
         if (document.fullscreenElement) document.exitFullscreen();
         else player.requestFullscreen?.();
     });
+
 
     function seekFromEvent(clientX) {
         if (!video.duration || !pWrap) return;
@@ -2205,7 +2320,8 @@ function attachVideoControls(video) {
     document.addEventListener('mouseup', () => { seeking = false; });
     pWrap?.addEventListener('touchstart', e => seekFromEvent(e.touches[0].clientX), { passive: true });
     pWrap?.addEventListener('touchmove', e => { e.preventDefault(); seekFromEvent(e.touches[0].clientX); }, { passive: false });
-    // Hover preview on timeline
+
+
     const previewEl = document.createElement('span');
     previewEl.className = 'progress-preview';
     pWrap?.appendChild(previewEl);
@@ -2221,10 +2337,12 @@ function attachVideoControls(video) {
     pWrap?.addEventListener('mouseleave', () => { previewEl.style.display = 'none'; });
     pWrap?.addEventListener('touchmove', e => updatePreview(e.touches[0].clientX), { passive: true });
 
+
     skipBtn?.addEventListener('click', () => {
         const seg = currentSkipSegments.find(s => video.currentTime >= s.start && video.currentTime < s.end);
         if (seg) video.currentTime = seg.end;
     });
+
 
     let _progTick = 0;
     video.addEventListener('timeupdate', () => {
@@ -2233,7 +2351,8 @@ function attachVideoControls(video) {
         if (pFill)   pFill.style.width = d ? `${(video.currentTime/d)*100}%` : '0%';
         handleSkipState(video);
         checkAnilistAutoUpdate(video.currentTime);
-        // Save progress every ~30s
+
+
         _progTick++;
         if (_progTick % 30 === 0) saveCurrentProgress();
     });
@@ -2250,7 +2369,7 @@ function attachVideoControls(video) {
     });
     video.addEventListener('ended', () => { if (playerSettings.autoNext) nextEpisode(); });
 
-    // Loading overlay on buffering
+
     function buffering(b) {
         const el = document.getElementById('playerLoading');
         if (el) el.classList.toggle('visible', b);
@@ -2259,24 +2378,26 @@ function attachVideoControls(video) {
     video.addEventListener('playing',  () => buffering(false));
     video.addEventListener('canplay',  () => buffering(false));
 
+
 }
 
-// ─── Skip segments ────────────────────────────────────────────────────────────
+
 async function loadSkipSegments(epNum, dur) {
     currentSkipSegments = []; skippedSegmentKeys = new Set();
     const ep = currentEpisodes[currentEpisodeIndex];
 
-    // Use Senshi intro/outro data if available
+
     if (ep?.intro_start != null && ep?.intro_end != null) {
         currentSkipSegments.push({ id: 'intro-senshi', type: 'Intro', start: Number(ep.intro_start), end: Number(ep.intro_end) });
     }
     if (ep?.outro_start != null && ep?.outro_end != null) {
         currentSkipSegments.push({ id: 'outro-senshi', type: 'Outro', start: Number(ep.outro_start), end: Number(ep.outro_end) });
     }
-    // Filter valid segments
+
+
     currentSkipSegments = currentSkipSegments.filter(s => Number.isFinite(s.start) && Number.isFinite(s.end) && s.end > s.start);
 
-    // If no Senshi data, fallback to aniskip API
+
     const malId = currentMalId || currentAnimeDetail?.malId;
     if (!currentSkipSegments.length && malId) {
     try {
@@ -2293,7 +2414,8 @@ async function loadSkipSegments(epNum, dur) {
                 end  : Number(i.interval.endTime)
             }))
             .filter(i => Number.isFinite(i.start) && Number.isFinite(i.end) && i.end > i.start);
-        // Draw markers
+
+
         const markers = document.getElementById('skipMarkers');
         if (markers && currentSkipSegments.length && dur) {
             markers.innerHTML = currentSkipSegments.map(s => {
@@ -2301,9 +2423,10 @@ async function loadSkipSegments(epNum, dur) {
                 return `<span class="skip-marker ${s.type.toLowerCase()}" style="left:${l}%;width:${w}%"></span>`;
             }).join('');
         }
-    } catch { /* optional */ }
+    } catch {  }
     }
 }
+
 
 function handleSkipState(video) {
     const btn = document.getElementById('skipSegmentBtn');
@@ -2320,7 +2443,7 @@ function handleSkipState(video) {
     }
 }
 
-// ─── Player controls ──────────────────────────────────────────────────────────
+
 function destroyHls() {
     if (activeHls) { activeHls.destroy(); activeHls = null; }
     activeVideo = null;
@@ -2347,6 +2470,7 @@ function closePlayer() {
 }
 function goHome() { switchTab('home'); }
 
+
 function toggleNav() {
     document.getElementById('navbar').classList.toggle('nav-open');
 }
@@ -2356,11 +2480,11 @@ document.addEventListener('click', e => {
     }
 });
 
-// ─── Router ───────────────────────────────────────────────────────────────────
+
 function loadRoute() {
     const p = location.pathname;
 
-    // Anime detail page
+
     const animeMatch = p.match(/^\/anime\/(.+)$/);
     if (animeMatch) {
         const raw = decodeURIComponent(animeMatch[1]);
@@ -2368,7 +2492,7 @@ function loadRoute() {
         if (id) { viewAnimeDetails(id); return; }
     }
 
-    // Watch page
+
     const watchMatch = p.match(/^\/watch\/([^/]+)\/ep-(.+)$/);
     if (watchMatch) {
         const raw = decodeURIComponent(watchMatch[1]);
@@ -2376,6 +2500,7 @@ function loadRoute() {
         const ep = watchMatch[2];
         if (id) { startStreaming(id, 'sub', ep); return; }
     }
+
 
     if (/^\/trending/i.test(p))  return switchTab('trending', false);
     if (/^\/seasonal/i.test(p))  return switchTab('seasonal', false);
@@ -2395,7 +2520,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebarGenres();
     updateAnilistStatus();
     restoreAnilistSettings();
-    // Auth button — toggle user menu on click when logged in
+
+
     document.getElementById('authBtn')?.addEventListener('click', e => {
         if (currentUser) {
             e.preventDefault();
@@ -2406,14 +2532,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    // Close user menu on outside click
+
+
     document.addEventListener('click', e => {
         const menu = document.getElementById('userMenu');
         if (menu && !e.target.closest('#authBtn') && !e.target.closest('.user-menu')) {
             menu.style.display = 'none';
         }
     });
-    // Close auth modal on Escape
+
+
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             if (document.getElementById('authModal')?.classList.contains('active')) {
@@ -2421,7 +2549,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    // Global tooltip — positioned near trigger, no mouse-follow
+
+
     let tipTimer = null;
     let tipLastId = null;
     const tip = document.getElementById('globalTooltip');
@@ -2467,7 +2596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.top  = y + 'px';
     }
 
-    // Cinema bar (strip) controls — wired once since elements are static
+
     syncStripToggles();
     document.getElementById('focusBtn')?.addEventListener('click', toggleFocusMode);
     document.getElementById('prevEpBtn')?.addEventListener('click', prevEpisode);
@@ -2481,13 +2610,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stripAutoSkip')?.addEventListener('change', e => {
         playerSettings.autoSkip = e.target.checked; saveSettings();
     });
-    // Keyboard shortcuts
+
+
     document.addEventListener('keydown', e => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
         const w = document.querySelector('.watch-page');
         if (!w?.classList.contains('active')) return;
         const v = activeVideo;
         if (!v) return;
+
 
         if (e.key === 'Escape') {
             if (document.getElementById('episodeModal')?.classList.contains('active')) { e.preventDefault(); closeEpisodeModal(); return; }
@@ -2509,13 +2640,14 @@ function hideTooltip() {
     if (tip) tip.style.display = 'none';
 }
 
-// ─── SETTINGS UI ─────────────────────────────────────────────────────────────
+
 function switchSettingsTab(tabId, btn) {
     document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.settings-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(tabId === 'profile' ? 'settingsProfile' : 'settingsAnilist').classList.add('active');
 }
+
 
 function loadSettingsPage() {
     if (!currentUser) {
@@ -2527,6 +2659,7 @@ function loadSettingsPage() {
     updateAnilistStatus();
 }
 
+
 async function deleteAccount() {
     if (!confirm('Are you 100% sure you want to delete your account? This cannot be undone.')) return;
     try {
@@ -2537,13 +2670,15 @@ async function deleteAccount() {
     }
 }
 
-// ─── ANILIST OAUTH & GRAPHQL ──────────────────────────────────────────────────
+
 const ANILIST_CLIENT_ID = '41261';
 const REDIRECT_URI = window.location.origin + '/';
+
 
 function initiateAnilistAuth() {
     window.location.href = `https://anilist.co/api/v2/oauth/authorize?client_id=${ANILIST_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
 }
+
 
 (function handleAnilistRedirect() {
     const params = new URLSearchParams(window.location.search);
@@ -2570,6 +2705,7 @@ function initiateAnilistAuth() {
     .finally(() => document.getElementById('loadingOverlay').style.display = 'none');
 })();
 
+
 function updateAnilistStatus() {
     const token = localStorage.getItem('anilist_token');
     const btn = document.getElementById('anilistAuthBtn');
@@ -2584,6 +2720,7 @@ function updateAnilistStatus() {
         if (status) status.textContent = '';
     }
 }
+
 
 async function fetchAnilistWatchlist() {
     const token = localStorage.getItem('anilist_token');
@@ -2602,6 +2739,7 @@ async function fetchAnilistWatchlist() {
         const userId = viewerJson.data?.Viewer?.id;
         if (!userId) { console.error('[AniList] Could not fetch Viewer ID'); return; }
 
+
         const query = `query ($userId: Int) {
           MediaListCollection(userId: $userId, type: ANIME, status_in: [CURRENT, PLANNING, REPEATING]) {
             lists { entries { progress media { id idMal title { romaji english } coverImage { extraLarge } status } } }
@@ -2618,6 +2756,7 @@ async function fetchAnilistWatchlist() {
         let entries = [];
         lists.forEach(list => { (list.entries || []).forEach(entry => entries.push(entry)); });
         if (!entries.length) { console.log('[AniList] No entries found.'); return; }
+
 
         document.getElementById('anilistWatchingSection').style.display = 'block';
         const container = document.getElementById('anilistWatchingCarousel');
@@ -2642,7 +2781,7 @@ async function fetchAnilistWatchlist() {
     }
 }
 
-// ─── ANILIST SETTINGS ─────────────────────────────────────────────────────────
+
 function saveAnilistSettings() {
     localStorage.setItem('anilist_auto_update', document.getElementById('anilistAutoUpdate').checked);
     localStorage.setItem('anilist_show_row', document.getElementById('anilistShowRow').checked);
@@ -2650,6 +2789,7 @@ function saveAnilistSettings() {
     const sec = document.getElementById('anilistWatchingSection');
     if (sec) sec.style.display = show ? 'block' : 'none';
 }
+
 
 function restoreAnilistSettings() {
     if (!localStorage.getItem('anilist_token')) return;
@@ -2661,13 +2801,13 @@ function restoreAnilistSettings() {
     if (show) show.checked = localStorage.getItem('anilist_show_row') !== 'false';
 }
 
-// ─── ANILIST STATUS DROPDOWN ON DETAIL PAGE ───────────────────────────────────
+
 function showAnilistStatusDropdown() {
     const wrapper = document.getElementById('anilistStatusWrapper');
     if (wrapper && localStorage.getItem('anilist_token')) wrapper.style.display = '';
 }
 
-// ─── NOTIFICATION TOAST ───────────────────────────────────────────────────────
+
 function showAnilistNotification(msg) {
     const d = document.createElement('div');
     d.textContent = msg;
@@ -2676,7 +2816,7 @@ function showAnilistNotification(msg) {
     setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 300); }, 3000);
 }
 
-// ─── ANILIST STATUS MUTATION ──────────────────────────────────────────────────
+
 async function updateAnilistStatus(status, malId) {
     const token = localStorage.getItem('anilist_token');
     if (!token || !malId) return;
@@ -2699,10 +2839,12 @@ async function updateAnilistStatus(status, malId) {
     } catch { showAnilistNotification("Error updating status."); }
 }
 
-// ─── ANILIST AUTO PROGRESS ────────────────────────────────────────────────────
+
 let _anilistProgressUpdated = false;
 
+
 function resetAnilistProgress() { _anilistProgressUpdated = false; }
+
 
 function checkAnilistAutoUpdate(currentTime) {
     const token = localStorage.getItem('anilist_token');
@@ -2715,6 +2857,7 @@ function checkAnilistAutoUpdate(currentTime) {
     if (!malId || !ep) return;
     updateAnilistProgress(malId, ep.number);
 }
+
 
 async function updateAnilistProgress(malId, epNumber) {
     const token = localStorage.getItem('anilist_token');
@@ -2736,12 +2879,11 @@ async function updateAnilistProgress(malId, epNumber) {
     } catch {}
 }
 
-// ==========================================
-// ANILIST ADVANCED INTEGRATION
-// ==========================================
+
+
 let currentAnilistEntryId = null;
 
-// 1. Check if the anime is already on their list and update the buttons
+
 async function checkAnilistEntry(malId) {
     const token = localStorage.getItem('anilist_token');
     const btnDet = document.getElementById('btnDetailAnilist');
@@ -2751,7 +2893,8 @@ async function checkAnilistEntry(malId) {
     if (!token || !malId) return;
     if (btnDet) btnDet.style.display = 'inline-flex';
     if (btnWat) btnWat.style.display = 'inline-flex';
-    
+
+
     try {
         const query = `query { Media(idMal: ${malId}, type: ANIME) { id mediaListEntry { id status progress score repeat startedAt { year month day } completedAt { year month day } } } }`;
         const res = await fetch('https://graphql.anilist.co', {
@@ -2759,6 +2902,7 @@ async function checkAnilistEntry(malId) {
         });
         const data = await res.json();
         const entry = data.data?.Media?.mediaListEntry;
+
 
         currentAnilistEntryId = data.data?.Media?.id;
         const txt = entry ? "Update Status" : "Add to AniList";
@@ -2769,11 +2913,13 @@ async function checkAnilistEntry(malId) {
     } catch (e) { console.error(e); }
 }
 
+
 const originalViewDetails = viewAnimeDetails;
 viewAnimeDetails = async function(id) {
     await originalViewDetails(id);
     if (currentAnimeDetail?.malId) checkAnilistEntry(currentAnimeDetail.malId);
 }
+
 
 const originalStartStreaming = startStreaming;
 startStreaming = async function(id, lang, autoEp) {
@@ -2781,7 +2927,7 @@ startStreaming = async function(id, lang, autoEp) {
     if (currentAnimeDetail?.malId) checkAnilistEntry(currentAnimeDetail.malId);
 }
 
-// 2. Open Modal and Populate
+
 async function openAnilistModal(malId) {
     if (!malId) malId = currentAnimeDetail?.malId;
     if (!malId) return;
@@ -2792,7 +2938,9 @@ async function openAnilistModal(malId) {
     progAutoBox.disabled = !autoEnabled;
     if(!autoEnabled) progAutoBox.style.opacity = '0.5';
 
+
     const entry = await checkAnilistEntry(malId);
+
 
     document.getElementById('alModalStatus').value = entry?.status || 'AUTO';
     const statusLabels = { 'AUTO':'Auto (Default)','CURRENT':'Watching','PLANNING':'Plan to watch','COMPLETED':'Completed','REPEATING':'Rewatching','PAUSED':'Paused','DROPPED':'Dropped' };
@@ -2807,9 +2955,10 @@ async function openAnilistModal(malId) {
     document.getElementById('anilistModal').classList.add('active');
 }
 
+
 function closeAnilistModal() { document.getElementById('anilistModal').classList.remove('active'); }
 
-// 3. Save Modal
+
 async function saveAnilistModal() {
     const token = localStorage.getItem('anilist_token');
     if (!token || !currentAnilistEntryId) return;
@@ -2819,9 +2968,11 @@ async function saveAnilistModal() {
     let progress = parseInt(document.getElementById('alModalProgress').value) || 0;
     let repeat = parseInt(document.getElementById('alModalRewatches').value) || 0;
 
+
     const isAutoStatus = status === 'AUTO';
     const isAutoProg = document.getElementById('alModalProgAuto').dataset.checked === 'true';
     const isAutoRewatch = document.getElementById('alModalRewatchAuto').dataset.checked === 'true';
+
 
     if (isAutoProg) {
         progress = currentEpisodeIndex !== undefined ? parseInt(currentEpisodes[currentEpisodeIndex]?.number || 0) : progress;
@@ -2830,6 +2981,7 @@ async function saveAnilistModal() {
         const totalEps = currentAnimeDetail?.episodes || 9999;
         status = progress >= totalEps ? 'COMPLETED' : (progress > 0 ? 'CURRENT' : 'PLANNING');
     }
+
 
     const parseDate = (val) => {
         if(!val) return null;
@@ -2857,7 +3009,7 @@ async function saveAnilistModal() {
     } catch { showAnilistNotification('Error saving to AniList.'); }
 }
 
-// 4. Overhauled Auto-Update Logic (Rewatch & Completion Tracking)
+
 function checkAnilistAutoUpdate(currentTime) {
     const token = localStorage.getItem('anilist_token');
     if (!token || localStorage.getItem('anilist_auto_update') === 'false') return;
@@ -2869,6 +3021,7 @@ function checkAnilistAutoUpdate(currentTime) {
     if (!malId || !epNum) return;
     executeAdvancedAutoTracking(malId, epNum, totalEps);
 }
+
 
 async function executeAdvancedAutoTracking(malId, currentEp, totalEps) {
     const token = localStorage.getItem('anilist_token');
@@ -2901,7 +3054,7 @@ async function executeAdvancedAutoTracking(malId, currentEp, totalEps) {
     } catch {}
 }
 
-// 5. FIX THE ROW +1 BUG
+
 const originalFetchAnilistWatchlist = fetchAnilistWatchlist;
 fetchAnilistWatchlist = async function() {
     const token = localStorage.getItem('anilist_token');
@@ -2924,13 +3077,16 @@ fetchAnilistWatchlist = async function() {
             body: JSON.stringify({ query, variables: { userId } })
         });
 
+
         const json = await res.json();
         const lists = json.data?.MediaListCollection?.lists || [];
         let entries = [];
         lists.forEach(list => { (list.entries || []).forEach(entry => entries.push(entry)); });
         if (!entries.length) return;
 
+
         document.getElementById('anilistWatchingSection').style.display = 'block';
+
 
         const mappedData = entries.map(entry => {
             const anime = entry.media;
@@ -2945,7 +3101,7 @@ fetchAnilistWatchlist = async function() {
     } catch (e) { console.error('Failed to fetch AniList', e); }
 }
 
-// --- CUSTOM DROPDOWN LOGIC ---
+
 function toggleCustomDropdown(id) {
     document.getElementById(id).classList.toggle('open');
 }
@@ -2961,3 +3117,4 @@ document.addEventListener('click', function(event) {
         dropdown.classList.remove('open');
     }
 });
+

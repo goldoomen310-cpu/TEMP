@@ -312,17 +312,17 @@ const KYOTO_HEADERS = {
 };
 
 async function kyotoplayerPost(postId) {
-    const r = await fetch(`${KYOTO_API}/post?id=${encodeURIComponent(postId)}`, {
-        headers: KYOTO_HEADERS
-    });
+    const target = `${KYOTO_API}/post?id=${encodeURIComponent(postId)}`;
+    const url = `${CORS_PROXY}?url=${encodeURIComponent(target)}&headers=${encodeURIComponent(encodeHeaders(KYOTO_HEADERS))}`;
+    const r = await fetch(url);
     if (!r.ok) return null;
     return r.json();
 }
 
 async function kyotoplayerPlayer(embedUrl) {
-    const r = await fetch(`${KYOTO_API}/kai/player?embed=${encodeURIComponent(embedUrl)}&source=zoro`, {
-        headers: KYOTO_HEADERS
-    });
+    const target = `${KYOTO_API}/kai/player?embed=${encodeURIComponent(embedUrl)}&source=zoro`;
+    const url = `${CORS_PROXY}?url=${encodeURIComponent(target)}&headers=${encodeURIComponent(encodeHeaders(KYOTO_HEADERS))}`;
+    const r = await fetch(url);
     if (!r.ok) return null;
     return r.json();
 }

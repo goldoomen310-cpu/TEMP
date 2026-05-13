@@ -2,13 +2,16 @@
   "name": "aniview-web-player",
   "version": "0.2.0",
   "private": true,
-  "engines": { "node": ">=18.0.0" },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
     "bcryptjs": "^2.4.3",
+    "devtools-detect": "^4.0.2",
     "jsonwebtoken": "^9.0.2"
   }
 }

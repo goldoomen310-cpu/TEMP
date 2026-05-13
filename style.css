@@ -1,7 +1,4 @@
-/* ═══════════════════════════════════════════
-   AniView — Redesigned 2026
-   Clean · Modern · Minimal
-   ═══════════════════════════════════════════ */
+
 
 :root {
   --bg:           #0a0a0f;
@@ -60,7 +57,6 @@ img { display:block; }
 
 .main-content { min-height:100vh; padding-top:68px; }
 
-/* ─── Navbar ─────────────────────── */
 .navbar {
   position:fixed; top:0; width:100%; z-index:100;
   background:var(--glass);
@@ -103,7 +99,6 @@ img { display:block; }
 }
 .auth-btn.logged-in:hover { background:rgba(99,102,241,0.18); }
 
-/* ─── Page Headers ───────────────── */
 .page-header { text-align:center; padding:2.5rem 1.5rem 1rem; }
 .page-title {
   font-size:2rem; font-weight:800; letter-spacing:-0.3px;
@@ -111,7 +106,6 @@ img { display:block; }
 }
 .page-subtitle { color:var(--text-sub); font-size:0.9rem; }
 
-/* ─── Buttons ────────────────────── */
 .btn {
   display:inline-flex; align-items:center; justify-content:center;
   gap:0.4rem; padding:0.6rem 1.4rem; border-radius:var(--r-md);
@@ -133,7 +127,6 @@ img { display:block; }
 .btn-accent { background:var(--primary); color:#fff; }
 .btn-accent:hover { background:#5558e6; }
 
-/* ─── Badges ─────────────────────── */
 .badge {
   background:rgba(255,255,255,0.06); padding:0.2rem 0.6rem;
   border-radius:4px; font-size:0.75rem; font-weight:500;
@@ -142,7 +135,6 @@ img { display:block; }
 .badge-accent  { background:var(--primary); color:#fff; }
 .badge-gold    { background:rgba(245,158,11,0.12); color:#f59e0b; }
 
-/* ─── Loading ────────────────────── */
 .loading-overlay {
   position:fixed; inset:0; background:var(--bg);
   z-index:9999; display:flex; align-items:center; justify-content:center;
@@ -150,7 +142,6 @@ img { display:block; }
 .loader { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 0.7s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
-/* ─── Scroll Top ─────────────────── */
 .scroll-top {
   position:fixed; bottom:1.5rem; right:1.5rem; z-index:90;
   width:40px; height:40px; border-radius:50%;
@@ -161,7 +152,6 @@ img { display:block; }
 .scroll-top:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
 .scroll-top svg { width:16px; height:16px; }
 
-/* ─── Tooltip ────────────────────── */
 .global-tooltip {
   position:fixed; z-index:9999; pointer-events:none;
   background:var(--bg-elevated); border:1px solid var(--border-hover);
@@ -173,9 +163,6 @@ img { display:block; }
 .global-tooltip .tip-row { font-size:0.7rem; color:var(--text-muted); margin-bottom:0.2rem; }
 .global-tooltip .tip-row span { color:var(--text-sub); font-weight:600; }
 
-/* ═════════════════════════════════════
-   HOME LAYOUT
-   ═════════════════════════════════════ */
 .home-layout {
   display:grid; grid-template-columns:1fr 300px;
   gap:clamp(1.25rem, 3vw, 4rem); max-width:min(94vw, 1600px); margin:0 auto; padding:0 clamp(0.75rem, 2vw, 3rem);
@@ -231,7 +218,6 @@ img { display:block; }
   .home-sidebar { min-width:320px; }
 }
 
-/* ─── Sections & Carousels ───────── */
 .content-section { margin-bottom:clamp(1.25rem, 3vw, 3.5rem); }
 .section-header {
   display:flex; justify-content:space-between; align-items:center;
@@ -269,7 +255,6 @@ img { display:block; }
 .carousel-btn-right { right:0.25rem; }
 .carousel-btn svg { width:18px; height:18px; }
 
-/* ─── Anime Card ─────────────────── */
 .anime-card {
   min-width:clamp(130px, 12vw, 180px); max-width:clamp(130px, 12vw, 180px); flex-shrink:0;
   scroll-snap-align:start; cursor:pointer;
@@ -341,7 +326,6 @@ img { display:block; }
 .anime-card:hover .card-info-trigger { opacity:1; }
 .card-info-trigger:hover { background:var(--primary); }
 
-/* ─── Anime Grid ─────────────────── */
 .anime-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
@@ -349,7 +333,6 @@ img { display:block; }
 }
 .anime-grid .anime-card { min-width:unset; max-width:unset; }
 
-/* ─── Skeletons ──────────────────── */
 .carousel-skeleton { display:flex; gap:1rem; }
 .sk-card {
   min-width:170px; height:280px; flex-shrink:0;
@@ -379,9 +362,6 @@ img { display:block; }
 .player-empty-card strong { color:var(--text); font-size:1.1rem; }
 .load-more-container { text-align:center; padding:1.5rem 0 3rem; }
 
-/* ═════════════════════════════════════
-   SPOTLIGHT
-   ═════════════════════════════════════ */
 .spotlight {
   position:relative; width:100%; height:clamp(260px, 28vw, 460px);
   overflow:hidden; margin-bottom:clamp(1.25rem, 3vw, 3rem); background:var(--bg-surface);
@@ -447,9 +427,6 @@ img { display:block; }
 .spotlight-prev { left:1rem; }
 .spotlight-next { right:1rem; }
 
-/* ═════════════════════════════════════
-   DETAIL PAGE
-   ═════════════════════════════════════ */
 .detail-container { min-height:100vh; }
 .detail-header {
   position:relative; padding:5rem 1.5rem 3rem; min-height:70vh;
@@ -545,9 +522,6 @@ img { display:block; }
 .wp-ep-filter-wrap { padding:0.5rem 0 0.4rem; }
 .wp-ep-filter-wrap .ep-filter-input { width:100%; }
 
-/* ═════════════════════════════════════
-   WATCH PAGE
-   ═════════════════════════════════════ */
 .watch-page.active {
   display:flex; flex-direction:column; gap:1rem;
   width:100%; padding:0 1.5rem 1.5rem;
@@ -712,9 +686,6 @@ body.focus-active { overflow:hidden !important; }
 .watch-page.focus-mode .scroll-top { display:none !important; }
 .watch-page.focus-mode .main-content { padding-top:0; }
 
-/* ═════════════════════════════════════
-   VIDEO PLAYER CONTROLS
-   ═════════════════════════════════════ */
 .video-player { position:relative; width:100%; height:100%; background:#000; overflow:hidden; cursor:none; }
 .video-player:hover, .video-player.controls-active { cursor:auto; }
 .video-player video { width:100% !important; height:100% !important; object-fit:contain; display:block; }
@@ -751,7 +722,6 @@ body.focus-active { overflow:hidden !important; }
 .ctrl-btn.play-btn svg { width:26px; height:26px; }
 .video-controls .time-label { color:rgba(255,255,255,0.75); font-size:0.74rem; font-weight:500; margin-left:0.3rem; white-space:nowrap; }
 
-
 .player-center-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.7); z-index:8; opacity:0; transition:opacity 0.12s ease,transform 0.12s ease; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; }
 .player-center-icon.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
 .player-center-icon svg { width:64px; height:64px; color:#fff; filter:drop-shadow(0 0 20px rgba(0,0,0,0.6)); }
@@ -770,9 +740,6 @@ body.focus-active { overflow:hidden !important; }
 .settings-opt:hover { border-color:var(--primary-dim); color:var(--primary); }
 .settings-opt.active { background:var(--primary); border-color:var(--primary); color:#fff; }
 
-/* ═════════════════════════════════════
-   SCHEDULE · SEARCH · MODALS
-   ═════════════════════════════════════ */
 .schedule-week { display:flex; flex-direction:column; gap:0.65rem; max-width:1400px; margin:0 auto; padding:0 1.5rem; }
 .schedule-day {
   background:var(--bg-card); border:1px solid var(--border);
@@ -880,19 +847,15 @@ body.focus-active { overflow:hidden !important; }
 .ep-modal-play { color:var(--primary); opacity:0.5; flex-shrink:0; }
 .ep-modal-item:hover .ep-modal-play { opacity:1; }
 
-/* =========================================
-   ANILIST MODAL PREMIUM REDESIGN & BUG FIXES
-   ========================================= */
-/* FIX 1: Safely handle pointer events so the dropdown gets clicks */
 .modal-overlay.active { opacity:1; pointer-events:auto !important; }
-/* FIX 2: Stop the CSS transform from breaking the dropdown on mobile */
+
 .modal-overlay.active .ep-modal-content { transform:none !important; }
-/* FIX 3: Force the options to have a dark background so the white text is visible! */
+
 select.auth-input option {
     background-color: var(--bg-card) !important;
     color: var(--text) !important;
 }
-/* --- Premium Input Styling --- */
+
 .premium-input, .premium-select {
     background: rgba(0, 0, 0, 0.2) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -903,7 +866,7 @@ select.auth-input option {
     box-shadow: 0 0 0 3px rgba(61, 180, 242, 0.15) !important;
     background: rgba(0,0,0,0.4) !important;
 }
-/* --- Custom Select Styling --- */
+
 .premium-select {
     color: #3db4f2 !important; font-weight: 700 !important;
     appearance: none; cursor: pointer;
@@ -912,9 +875,7 @@ select.auth-input option {
     background-position: right 1rem center !important;
     background-size: 14px !important;
 }
-/* =========================================
-   SIMPLE AUTO BUTTON TOGGLE
-   ========================================= */
+
 .simple-auto-toggle {
     display: inline-flex;
     align-items: center;
@@ -943,14 +904,14 @@ select.auth-input option {
     border-color: #3db4f2;
     background: rgba(61, 180, 242, 0.1);
 }
-/* --- Date Input Calendar Icon Fix --- */
+
 .premium-input[type="date"] { color-scheme: dark; }
 .premium-input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.9) brightness(1.5);
     cursor: pointer; opacity: 1;
     width:18px; height:18px;
 }
-/* --- Cinematic Glowing Save Button --- */
+
 .anilist-modal-save {
     width: 100%; margin-top: 1.75rem;
     background: linear-gradient(135deg, #3db4f2 0%, #2582b6 100%);
@@ -965,12 +926,9 @@ select.auth-input option {
 }
 .anilist-modal-save:active { transform: translateY(0); }
 
-/* ─── AniList Action Button ──────── */
 .anilist-action-btn { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; }
 .anilist-action-btn svg { flex-shrink:0; }
 
-
-/* ─── Auth Modal ──────────────────── */
 .auth-modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.85);
   z-index:2000; display:flex; align-items:center; justify-content:center;
@@ -1006,7 +964,6 @@ select.auth-input option {
 .user-menu-item { display:flex; align-items:center; gap:0.4rem; width:100%; padding:0.5rem 1rem; border:none; background:none; color:var(--text-sub); font:inherit; font-size:0.8rem; font-weight:500; transition:var(--transition); }
 .user-menu-item:hover { background:var(--bg-hover); color:var(--text); }
 
-/* ─── Comments ────────────────────── */
 .wp-comments-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-md); padding:0.85rem; }
 .comments-container { max-height:360px; overflow-y:auto; }
 .comments-empty { padding:0.75rem 0; color:var(--text-muted); font-size:0.8rem; text-align:center; }
@@ -1031,10 +988,6 @@ select.auth-input option {
 .reply-form { display:none; flex-direction:column; gap:0.35rem; margin-top:0.35rem; padding-top:0.35rem; }
 .reply-form-actions { display:flex; gap:0.35rem; }
 .reply-textarea { min-height:48px; }
-
-/* ═════════════════════════════════════
-   FOOTER · BOTTOM NAV · RESPONSIVE
-   ═════════════════════════════════════ */
 
 .bottom-nav {
   display:none; position:fixed; bottom:0; left:0; right:0; z-index:101;
@@ -1090,8 +1043,6 @@ select.auth-input option {
 .footer-legal-links { display:flex; gap:1rem; }
 .footer-legal-links a { font-size:0.74rem; color:var(--text-muted); transition:var(--transition); }
 .footer-legal-links a:hover { color:var(--primary); }
-
-/* ─── Responsive ──────────────────── */
 
 @media (max-width:960px) {
   .nav-hamburger { display:flex; align-items:center; }
@@ -1173,7 +1124,6 @@ select.auth-input option {
   .episodes-section-header .ep-filter-input { width:100%; }
 }
 
-/* --- Reorganized Watch Details --- */
 .watch-info-split {
   display: flex;
   gap: 1.25rem;
@@ -1203,9 +1153,8 @@ select.auth-input option {
   border-radius: 4px; font-size: 0.68rem; font-weight: 500; color: var(--text-sub);
 }
 
-/* --- Mobile Overrides (Make it compact and native-feeling) --- */
 @media (max-width: 480px) {
-  /* Make the spotlight shorter on mobile */
+  
   .spotlight {
      height: 280px !important;
      margin-bottom: 1.5rem !important;
@@ -1215,7 +1164,7 @@ select.auth-input option {
   .spotlight-meta { margin-bottom: 0.3rem !important; }
   .spotlight-overview { display: none !important; }
   .spotlight-dots { bottom: 0.75rem !important; right: 1rem !important; }
-  /* Shrink Anime Cards in Carousel */
+  
   .anime-carousel .anime-card {
      min-width: 105px !important;
      max-width: 105px !important;
@@ -1224,18 +1173,17 @@ select.auth-input option {
   .anime-card .anime-title { font-size: 0.72rem !important; }
   .card-ep-badge { font-size: 0.55rem !important; }
 
-  /* Shrink Section Headers */
+  
   .section-header { margin-bottom: 0.6rem !important; }
   .section-title { font-size: 0.95rem !important; }
   .content-section { margin-bottom: 1rem !important; }
-  /* Adjust new Watch Details for mobile */
+  
   .watch-info-split { gap: 0.85rem; }
   .watch-info-poster { width: 95px; border-radius: var(--r-sm); }
   .wp-info-card .watch-title { font-size: 1.1rem; margin-bottom: 0.2rem; }
   .wp-info-card .watch-synopsis { font-size: 0.78rem; line-height: 1.5; }
 }
 
-/* --- Clean Edge-to-Edge Layout Fix --- */
 html { overflow-x: clip; }
 
 .nav-container,.home-layout,.anime-grid,.detail-content-wrapper,.detail-section,.episodes-section,.schedule-week,.footer-inner,.footer-bottom {
@@ -1252,9 +1200,6 @@ html { overflow-x: clip; }
 
 .detail-backdrop { width: 100vw !important; max-width: 100vw !important; left: 0; right: 0; margin: 0; }
 
-/* =========================================
-   1. CAROUSEL TO 5-COLUMN GRID CONVERSION
-   ========================================= */
 .anime-carousel {
   display: grid !important;
   grid-template-columns: repeat(5, 1fr) !important;
@@ -1271,9 +1216,6 @@ html { overflow-x: clip; }
 @media (max-width: 900px) { .anime-carousel { grid-template-columns: repeat(3, 1fr) !important; } }
 @media (max-width: 600px) { .anime-carousel { grid-template-columns: repeat(2, 1fr) !important; } }
 
-/* =========================================
-   2. UI DESIGNS AND VISUAL POLISH
-   ========================================= */
 body {
   background: radial-gradient(circle at 50% 0%, #151524 0%, var(--bg) 45%);
   background-attachment: fixed;
@@ -1295,9 +1237,6 @@ body {
   box-shadow: 0 12px 24px rgba(0,0,0,0.3);
 }
 
-/* =========================================
-   3. LEGAL PAGES STYLING (ToS & Privacy)
-   ========================================= */
 .legal-content {
   max-width: 800px;
   margin: 0 auto 3rem;
@@ -1317,16 +1256,10 @@ body {
   .legal-content { padding: 1.5rem; margin: 0 1rem 2rem; }
 }
 
-/* =========================================
-   FIX: Remove annoying white bounce effect (Without breaking scroll!)
-   ========================================= */
 html, body {
   background-color: var(--bg) !important;
 }
 
-/* =========================================
-   1. PAGINATED CAROUSEL (Sliding Rows)
-   ========================================= */
 .anime-carousel {
   display: flex !important;
   flex-wrap: nowrap !important;
@@ -1347,30 +1280,27 @@ html, body {
   min-width: 0 !important;
   max-width: none !important;
 }
-/* Tablet */
+
 @media (max-width: 960px) {
   .anime-carousel .anime-card { width: calc((100% - (3 * clamp(0.5rem, 1vw, 1rem))) / 4) !important; }
 }
-/* Phone (Portrait AND Landscape Touch Devices) */
+
 @media (max-width: 600px), (max-width: 950px) and (orientation: landscape) and (pointer: coarse) {
   .anime-carousel { gap: 0.5rem !important; }
   .anime-carousel .anime-card { width: calc((100% - (2 * 0.5rem)) / 3) !important; }
 }
-/* Static Grid Pages */
+
 .anime-grid {
   display: grid !important;
   grid-template-columns: repeat(5, 1fr) !important;
   gap: clamp(0.5rem, 1vw, 1rem) !important;
 }
 @media (max-width: 960px) { .anime-grid { grid-template-columns: repeat(4, 1fr) !important; } }
-/* Phone Static Grid (Portrait AND Landscape Touch Devices) */
+
 @media (max-width: 600px), (max-width: 950px) and (orientation: landscape) and (pointer: coarse) {
    .anime-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.5rem !important; }
 }
 
-/* =========================================
-   2. MOBILE NAVBAR ALIGNMENT FIX
-   ========================================= */
 @media (max-width: 768px), (max-width: 950px) and (orientation: landscape) and (pointer: coarse) {
   .nav-container {
     display: flex !important;
@@ -1389,21 +1319,12 @@ html, body {
   .nav-auth { display: flex !important; order: 4 !important; width: auto !important; margin: 0 !important; flex-shrink: 0 !important; }
 }
 
-/* =========================================
-   3. MOBILE OVERRIDES
-   ========================================= */
 @media (max-width: 768px), (max-width: 950px) and (orientation: landscape) and (pointer: coarse) {
   .carousel-btn { display: none !important; }
 }
 
-/* =========================================
-   1. HAMBURGER MENU REMOVAL
-   ========================================= */
 .nav-hamburger { display: none !important; }
 
-/* =========================================
-   2. FIX DESKTOP GRID SIZE (Trending/Seasonal/Search)
-   ========================================= */
 .anime-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
@@ -1417,9 +1338,6 @@ html, body {
   }
 }
 
-/* =========================================
-   3. GLOBAL DESIGN POLISH & GLOWS
-   ========================================= */
 .section-title, .page-title, .detail-title, .wp-now-playing {
   background: linear-gradient(to right, #ffffff, #a5b4fc);
   -webkit-background-clip: text;
@@ -1437,9 +1355,6 @@ html, body {
   border-color: rgba(99, 102, 241, 0.5) !important;
 }
 
-/* =========================================
-   4. DETAILS PAGE REDESIGN
-   ========================================= */
 .detail-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
 .detail-backdrop {
   opacity: 0.25 !important;
@@ -1455,9 +1370,6 @@ html, body {
 }
 .detail-poster:hover { transform: perspective(1000px) rotateY(0deg) scale(1.03); }
 
-/* =========================================
-   5. WATCH PAGE REDESIGN (Theater Mode)
-   ========================================= */
 .wp-cinema {
   box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(99, 102, 241, 0.12) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
@@ -1481,15 +1393,9 @@ html, body {
   box-shadow: -4px 0 0 var(--primary);
 }
 
-/* =========================================
-   1. KILL THE UGLY WHITE LINE
-   ========================================= */
 .detail-header, .wp-cinema, .nav-links { border-bottom: none !important; }
 .wp-cinema { border: none !important; }
 
-/* =========================================
-   2. REPOSITION THE COUNTDOWN
-   ========================================= */
 .watch-info-content .next-ep-countdown-inline {
   display: inline-block;
   background: rgba(99, 102, 241, 0.15);
@@ -1502,9 +1408,6 @@ html, body {
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-/* =========================================
-   3. BIGGER PLAYER UI
-   ========================================= */
 .video-controls { padding: 3.5rem 1.5rem 1rem !important; }
 .ctrl-btn { width: 44px !important; height: 44px !important; }
 .ctrl-btn svg { width: 24px !important; height: 24px !important; }
@@ -1514,15 +1417,9 @@ html, body {
 .video-controls .progress-wrap:hover { height: 10px !important; }
 .next-ep-countdown-player { margin-left:0.75rem; color:#a5b4fc; font-size:0.75rem; font-weight:600; white-space:nowrap; }
 
-/* =========================================
-   Turnstile widget in auth modal
-   ========================================= */
 .auth-modal-body .cf-turnstile { margin:0.75rem 0; display:flex; justify-content:center; }
 .auth-modal-body .cf-turnstile iframe { max-width:100%; }
 
-/* =========================================
-   SETTINGS PAGE STYLES
-   ========================================= */
 .settings-container { max-width:800px; margin:0 auto; padding:0 1.5rem 3rem; }
 .settings-tabs { display:flex; gap:1rem; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
 .settings-tab-btn { background:none; border:none; color:var(--text-sub); font-size:1rem; font-weight:600; padding:0.75rem 1.5rem; cursor:pointer; transition:0.2s; border-bottom:2px solid transparent; }
@@ -1557,9 +1454,6 @@ html, body {
 .anilist-status-wrapper { display:none; position:relative; }
 .anilist-status-wrapper::after { content:"▼"; position:absolute; right:1rem; top:50%; transform:translateY(-50%); color:#3db4f2; pointer-events:none; font-size:0.7rem; }
 
-/* =========================================
-   HIDE NUMBER INPUT ARROWS
-   ========================================= */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -1568,9 +1462,7 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
-/* =========================================
-   CUSTOM DROPDOWN UI
-   ========================================= */
+
 .custom-dropdown {
   position: relative;
   width: 100%;

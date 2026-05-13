@@ -39,7 +39,6 @@
 </nav>
 
 <main class="main-content" id="mainContent">
-    <!-- HOME PAGE -->
     <section class="page active" id="homePage">
         <div class="spotlight" id="spotlight" style="display:none">
             <div class="spotlight-slides" id="spotlightSlides"></div>
@@ -90,7 +89,6 @@
         </div>
     </section>
 
-    <!-- SEARCH PAGE -->
     <section class="page" id="searchPage">
         <div class="page-header" style="margin-bottom:2rem">
             <h1 class="page-title" id="searchResultTitle">Browse Anime</h1>
@@ -100,7 +98,6 @@
                 <button class="btn btn-primary search-submit" onclick="executeSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="margin-right:0.4rem;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
             </div>
             <div class="search-filters" id="searchFilters">
-                <!-- Genre -->
                 <div class="mselect-wrap" data-mselect="genre"><button class="mselect-trigger" onclick="toggleMS(this)">All Genres ▾</button>
                     <div class="mselect-drop">
                         <label><input type="checkbox" value="Action" onchange="onMSChange(this)"> Action</label>
@@ -113,7 +110,6 @@
                         <label><input type="checkbox" value="Sci-Fi" onchange="onMSChange(this)"> Sci-Fi</label>
                     </div>
                 </div>
-                <!-- Year -->
                 <div class="mselect-wrap" data-mselect="year"><button class="mselect-trigger" onclick="toggleMS(this)">Any Year ▾</button>
                     <div class="mselect-drop">
                         <label><input type="checkbox" value="2026" onchange="onMSChange(this)"> 2026</label>
@@ -121,7 +117,6 @@
                         <label><input type="checkbox" value="2024" onchange="onMSChange(this)"> 2024</label>
                     </div>
                 </div>
-                <!-- Season -->
                 <div class="mselect-wrap" data-mselect="season"><button class="mselect-trigger" onclick="toggleMS(this)">Any Season ▾</button>
                     <div class="mselect-drop">
                         <label><input type="checkbox" value="WINTER" onchange="onMSChange(this)"> Winter</label>
@@ -130,14 +125,12 @@
                         <label><input type="checkbox" value="FALL" onchange="onMSChange(this)"> Fall</label>
                     </div>
                 </div>
-                <!-- Format -->
                 <div class="mselect-wrap" data-mselect="format"><button class="mselect-trigger" onclick="toggleMS(this)">All Types ▾</button>
                     <div class="mselect-drop">
                         <label><input type="checkbox" value="TV" onchange="onMSChange(this)"> TV</label>
                         <label><input type="checkbox" value="MOVIE" onchange="onMSChange(this)"> Movie</label>
                     </div>
                 </div>
-                <!-- Status -->
                 <div class="mselect-wrap" data-mselect="status"><button class="mselect-trigger" onclick="toggleMS(this)">Any Status ▾</button>
                     <div class="mselect-drop">
                         <label><input type="checkbox" value="RELEASING" onchange="onMSChange(this)"> Ongoing</label>
@@ -147,7 +140,6 @@
                         <label><input type="checkbox" value="CANCELLED" onchange="onMSChange(this)"> Cancelled</label>
                     </div>
                 </div>
-                <!-- Sort -->
                 <div class="mselect-wrap" data-mselect="sort"><button class="mselect-trigger" onclick="toggleMS(this)">Default ▾</button>
                     <div class="mselect-drop">
                         <label><input type="radio" name="ms-sort" value="" onchange="onMSChange(this)" checked> Default</label>
@@ -163,7 +155,6 @@
         <div class="load-more-container"><button class="btn btn-ghost" id="loadMoreSearch" style="display:none" onclick="loadMoreSearch()">Load More</button></div>
     </section>
 
-    <!-- TRENDING PAGE -->
     <section class="page" id="trendingPage">
         <div class="page-header">
             <h1 class="page-title">Trending Anime</h1>
@@ -173,7 +164,6 @@
         <div class="load-more-container"><button class="btn btn-outline" id="loadMoreTrending" onclick="loadMoreTrending()">Load More</button></div>
     </section>
 
-    <!-- SEASONAL PAGE -->
     <section class="page" id="seasonalPage">
         <div class="page-header">
             <h1 class="page-title">Seasonal Anime</h1>
@@ -182,7 +172,6 @@
         <div class="anime-grid" id="seasonalGrid"></div>
     </section>
 
-    <!-- SCHEDULE PAGE -->
     <section class="page" id="schedulePage">
         <div class="page-header">
             <h1 class="page-title">Schedule</h1>
@@ -220,7 +209,6 @@
         </div>
     </section>
 
-    <!-- SETTINGS PAGE -->
     <section class="page" id="settingsPage">
         <div class="page-header">
             <h1 class="page-title">Settings</h1>
@@ -279,7 +267,6 @@
         </div>
     </section>
 
-    <!-- DETAIL PAGE -->
     <section class="page" id="detailPage">
         <div class="detail-container" id="detailContainer"></div>
         <div class="episodes-section" id="episodesSection" style="display:none">
@@ -291,7 +278,6 @@
         </div>
     </section>
 
-    <!-- WATCH PAGE -->
     <section class="page watch-page" id="watchPage">
         <div class="wp-cinema">
             <div class="wp-cinema-inner">
@@ -460,32 +446,13 @@
     else BASE = window.location.origin + '/api';
     window.API_BASE = BASE;
 })();
-(function(){
-    // 1. Disable right-click menu
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-    // 2. Disable common DevTools keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U)
-    document.addEventListener('keydown', function(e) {
-        if (e.keyCode === 123 ||
-            (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
-            (e.ctrlKey && e.keyCode === 85)) {
-            e.preventDefault();
-        }
-    });
-    // 3. The Aggressive Loop: Constantly clear the console
-    setInterval(function(){ console.clear(); }, 100);
-    // 4. The Trap: Detect if DevTools is actually open and force a reload
-    setInterval(function() {
-        var start = new Date().getTime();
-        debugger;
-        var end = new Date().getTime();
-        if (end - start > 100) {
-            console.clear();
-            window.location.reload();
-        }
-    }, 500);
-    // 5. Overwrite native console logging methods to prevent variable inspection
-    setTimeout(function(){ ['log','warn','error','info','debug','trace'].forEach(function(m){ console[m] = function(){}; }); }, 1000);
-})();
+
+</script>
+<script type="module">
+import devtools from 'https://cdn.jsdelivr.net/npm/devtools-detect@4.0.2/index.js';
+window.addEventListener('devtoolschange', function(e) {
+    if (e.detail.isOpen) { window.location.reload(); }
+});
 </script>
 <script src="/app.js"></script>
 <div class="modal-overlay" id="anilistModal" onclick="if(event.target===this)closeAnilistModal()">
